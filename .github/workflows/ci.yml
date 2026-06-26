@@ -5,6 +5,10 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build-test:
@@ -18,6 +22,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.0.x
+          cache: true
 
       - name: Restore
         run: dotnet restore PeoplePortal.sln
@@ -31,8 +36,13 @@ jobs:
       - name: Codacy coverage reporter
         if: ${{ secrets.CODACY_PROJECT_TOKEN != '' }}
         run: |
-          bash <(curl -Ls https://coverage.codacy.com/get.sh) report \
-            -r tests/PeoplePortal.UnitTests/TestResults/**/coverage.cobertura.xml
+          COVERAGE_FILE=$(find . -type f -name "coverage.cobertura.xml" | head -n 1)
+          if [ -z "$COVERAGE_FILE" ]; then
+            echo "No coverage.cobertura.xml file found"
+            exit 1
+          fi
+          echo "Reporting coverage file: $COVERAGE_FILE"
+          bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r "$COVERAGE_FILE"
         env:
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
