@@ -1,0 +1,6 @@
+@PeoplePortal.Api_HostAddress = http://localhost:5070
+
+GET {{PeoplePortal.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
