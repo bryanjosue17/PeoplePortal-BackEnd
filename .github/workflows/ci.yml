@@ -13,6 +13,8 @@ permissions:
 jobs:
   build-test:
     runs-on: ubuntu-latest
+    env:
+      CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
     steps:
       - name: Checkout
@@ -34,7 +36,7 @@ jobs:
         run: dotnet test PeoplePortal.sln --no-build --configuration Release --collect:"XPlat Code Coverage"
 
       - name: Codacy coverage reporter
-        if: ${{ secrets.CODACY_PROJECT_TOKEN != '' }}
+        if: ${{ env.CODACY_PROJECT_TOKEN != '' }}
         run: |
           COVERAGE_FILE=$(find . -type f -name "coverage.cobertura.xml" | head -n 1)
           if [ -z "$COVERAGE_FILE" ]; then
@@ -43,8 +45,6 @@ jobs:
           fi
           echo "Reporting coverage file: $COVERAGE_FILE"
           bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r "$COVERAGE_FILE"
-        env:
-          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
       - name: Trivy FS Scan
         uses: aquasecurity/trivy-action@0.24.0
