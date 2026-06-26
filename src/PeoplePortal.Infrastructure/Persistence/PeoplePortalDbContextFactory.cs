@@ -8,8 +8,12 @@ public class PeoplePortalDbContextFactory : IDesignTimeDbContextFactory<PeoplePo
     public PeoplePortalDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<PeoplePortalDbContext>();
-        optionsBuilder.UseSqlServer(
-            "Server=.\\SQLEXPRESS;Database=PeoplePortalDb;Trusted_Connection=True;TrustServerCertificate=True;");
+        var connectionString =
+            Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") ??
+            Environment.GetEnvironmentVariable("ConnectionStrings:DefaultConnection") ??
+            "Server=.\\SQLEXPRESS;Database=PeoplePortalDb;Trusted_Connection=True;TrustServerCertificate=True;";
+
+        optionsBuilder.UseSqlServer(connectionString);
 
         return new PeoplePortalDbContext(optionsBuilder.Options);
     }

@@ -105,6 +105,8 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAuthenticatedUser().RequireRole("hr"));
 });
 
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -117,6 +119,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.MapHealthChecks("/health");
 app.MapControllers();
 
 app.Run();

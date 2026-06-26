@@ -1,0 +1,16 @@
+.git
+.github
+.vs
+.vscode
+**/bin
+**/obj
+**/TestResults
+**/.user
+*.suo
+*.user
+*.rsuser
+*.mdf
+*.ldf
+*.ndf
+Dockerfile
+docker-compose.yml

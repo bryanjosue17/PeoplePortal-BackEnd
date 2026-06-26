@@ -58,3 +58,28 @@ jobs:
         with:
           name: coverage-results
           path: '**/TestResults/**'
+
+  deploy-local:
+    needs: build-test
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/develop'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker compose --profile tools build api migrate
+
+      - name: Deploy to local K8s
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/secret.yaml
+          kubectl apply -f k8s/configmap.yaml
+          kubectl apply -f k8s/sqlserver.yaml
+          kubectl delete job peopleportal-migrations -n peopleportal --ignore-not-found
+          kubectl apply -f k8s/migration-job.yaml
+          kubectl wait --for=condition=complete job/peopleportal-migrations -n peopleportal --timeout=180s
+          kubectl apply -f k8s/api-deployment.yaml
+          kubectl rollout restart deployment/peopleportal-api -n peopleportal
+          kubectl rollout status deployment/peopleportal-api -n peopleportal --timeout=120s

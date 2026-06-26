@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: peopleportal-config
+  namespace: peopleportal
+data:
+  ASPNETCORE_ENVIRONMENT: "Development"
+  ASPNETCORE_URLS: "http://+:8080"
+  Authentication__Authority: "http://keycloak-service:8080/realms/peopleportal"
+  Authentication__Audience: "peopleportal-api"

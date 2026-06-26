@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: peopleportal-api
+  namespace: peopleportal
+  labels:
+    app: peopleportal-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: peopleportal-api
+  template:
+    metadata:
+      labels:
+        app: peopleportal-api
+    spec:
+      containers:
+        - name: api
+          image: peopleportal-api:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: peopleportal-config
+          env:
+            - name: ConnectionStrings__DefaultConnection
+              valueFrom:
+                secretKeyRef:
+                  name: peopleportal-secrets
+                  key: ConnectionStrings__DefaultConnection
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: peopleportal-api-service
+  namespace: peopleportal
+spec:
+  selector:
+    app: peopleportal-api
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 8080
+      nodePort: 30081

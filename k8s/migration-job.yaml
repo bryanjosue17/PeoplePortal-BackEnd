@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: peopleportal-migrations
+  namespace: peopleportal
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: peopleportal-migrations
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate
+          image: peopleportal-api-migrations:latest
+          imagePullPolicy: Never
+          env:
+            - name: ConnectionStrings__DefaultConnection
+              valueFrom:
+                secretKeyRef:
+                  name: peopleportal-secrets
+                  key: ConnectionStrings__DefaultConnection
