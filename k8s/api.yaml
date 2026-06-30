@@ -16,12 +16,6 @@ spec:
         app: peopleportal-api
     spec:
       initContainers:
-        - name: wait-sqlserver
-          image: busybox:1.36
-          command:
-            - sh
-            - -c
-            - "until nc -z sqlserver-service 1433; do echo waiting for sqlserver; sleep 3; done"
         - name: wait-keycloak
           image: busybox:1.36
           command:

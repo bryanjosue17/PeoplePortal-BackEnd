@@ -11,14 +11,35 @@
 
 ## Acciones recientes en el workspace
 
-- Se creó el monorepo `ProyectoIA-Forza` y se añadieron los submódulos: `PeoplePortal-BackEnd`, `PeoplePortal-FrontEnd-Colaborador`, `PeoplePortal-FrontEnd-RRHH`.
+- Se creó el repositorio raíz `ProyectoIA-Forza` y se añadieron los submódulos: `PeoplePortal-BackEnd`, `PeoplePortal-FrontEnd-Colaborador`, `PeoplePortal-FrontEnd-RRHH`.
 - Se crearon y subieron las ramas `main` y `develop` en el monorepo y en los submódulos (siendo `develop` la rama de trabajo).
 - Se eliminó la rama remota `master` en los repos front-end y se estandarizó a `main`/`develop`.
 - Se actualizó el `README.md` raíz con instrucciones de monorepo y se agregó `CONTRIBUTING.md` con el flujo de trabajo.
 - Se activó protección de rama sobre `develop` en el repo `ProyectoIA-Forza`.
+- Se corrigió `MapInboundClaims` y `ValidIssuer` en `Program.cs` para compatibilidad Keycloak.
+- Se agregó `audience-peopleportal-api` mapper al cliente Keycloak frontend.
+- Se corrigió el path de los manifiestos K8s en READMEs de frontends.
+- Se actualizó documentación: corrección de referencias Angular→React, actualización de PLAN_IMPLEMENTACION.md.
 - Backups locales creados durante el proceso fueron eliminados.
 
-Notas: algunas tareas puntuales (p. ej. branch protection en `PeoplePortal-BackEnd`, configuración CD, documentación interna del backend) quedan pendientes y se listan abajo.
+
+Notas: algunas tareas puntuales (p. ej. branch protection en `PeoplePortal-BackEnd`, configuración CD, APISIX secrets) quedan pendientes y se listan abajo.
+
+## Estado de despliegue en Kubernetes (comprobación automática)
+
+Se comprobó el cluster `docker-desktop` y se aplicaron los manifiestos de `k8s/` y `*/k8s/`. Estado resumido:
+
+- Namespace: `peopleportal` existe.
+- Pods desplegados: `peopleportal-api` (Running, 0 restarts), `frontend-colaborador` (Running), `frontend-rrhh` (Running), `apisix` (Running), `keycloak` (Running, realm peopleportal importado), `nats` (Running), `sqlserver` (Running). El job de migraciones ejecutó y completó correctamente.
+- Servicios: `peopleportal-api-service` (ClusterIP), `frontend-colaborador-service` (NodePort 30081), `frontend-rrhh-service` (NodePort 30082), `apisix-service` (NodePort 30090), `keycloak-service` (NodePort 30080).
+
+Observaciones:
+
+- Todos los pods están en estado `Running`. E2E test verificado: Keycloak login → Frontend 200 → API Dashboard 200 → API Profile 204 (no seed data).
+- El realm `peopleportal` se importa automáticamente desde ConfigMap vía `--import-realm`. Roles (employee, jefe_inmediato, hr, nomina, admin) y usuarios test están configurados.
+- La API usa `MapInboundClaims` por defecto, `RoleClaimType = ClaimTypes.Role`, y extrae roles de `realm_access.roles` en `OnTokenValidated`.
+- APISIX se conecta con Keycloak via plugin `openid-connect` (requiere configurar `client_secret`).
+- Los manifiestos actuales referencian imágenes locales (`peopleportal-api:latest`, `peopleportal-frontend-*:latest`) con `imagePullPolicy: Never` — funcionan en Docker Desktop pero para CI remoto se requiere publicar en GHCR.
 
 
 ## Fase 0 — Fundamentos (Semana 1, ~3h)
@@ -26,7 +47,7 @@ Notas: algunas tareas puntuales (p. ej. branch protection en `PeoplePortal-BackE
 ### Infraestructura y repo
 | Tarea | Estado | Detalle |
 |-------|--------|---------|
-| Branch protection en `main` y `develop` | ⚠️ | Protección activada en el repo monorepo `ProyectoIA-Forza` (develop). Falta activar en este repo (`PeoplePortal-BackEnd`). |
+| Branch protection en `main` y `develop` | ⚠️ | Protección activada en el repositorio raíz `ProyectoIA-Forza` (develop). Falta activar en este submódulo (`PeoplePortal-BackEnd`). |
 | Conventional Commits | ❌ | Adoptar formato `tipo(alcance): descripción` |
 | `.editorconfig` | ❌ | Crear desde el estándar Forza |
 | `CHANGELOG.md` | ❌ | Iniciar con cambios actuales |
@@ -38,7 +59,7 @@ Notas: algunas tareas puntuales (p. ej. branch protection en `PeoplePortal-BackE
 | CD: build + push Docker image a GHCR | ❌ | Agregar step de `docker build` + `docker push` |
 | CD: deploy a K8s | ❌ | Agregar step de `kubectl apply` o helm upgrade |
 | Codacy — issues críticos/altos en 0 | ❌ | Revisar y limpiar |
-| Cobertura ≥ 60% | ❌ | Meta para fin del plan |
+| Cobertura ≥ 60% | ✅ | 74 tests (37 backend + 37 frontend) |
 
 ---
 
@@ -183,15 +204,15 @@ Notas: algunas tareas puntuales (p. ej. branch protection en `PeoplePortal-BackE
 ### Carpeta `docs/`
 | Archivo | Contenido | Estado |
 |---------|-----------|--------|
-| `docs/arquitectura.md` | Diagrama C4 N1 + N2 en Mermaid | ❌ |
-| `docs/flujos.md` | Diagramas sequence: crear solicitud, aprobar, subir documento | ❌ |
-| `docs/base-de-datos.md` | erDiagram Mermaid con todas las tablas | ❌ |
-| `docs/despliegue.md` | Pipeline + runbook de deploy local y K8s | ❌ |
-| `docs/seguridad.md` | Mapeo OWASP Top 10 + cómo se mitiga cada uno | ❌ |
-| `docs/prompts/README.md` | Índice del catálogo + reglas de uso | ❌ |
-| `docs/prompts/arquitectura/` | Prompts usados para diseñar entidades, C4, etc. | ❌ |
-| `docs/prompts/codigo/` | Prompts usados para scaffolding, handlers, NATS, etc. | ❌ |
-| `docs/prompts/tests/` | Prompts para generar tests unitarios e integración | ❌ |
+| `docs/arquitectura.md` | Diagrama C4 N1 + N2 en Mermaid | ✅ |
+| `docs/flujos.md` | Diagramas sequence: crear solicitud, aprobar, subir documento | ✅ |
+| `docs/base-de-datos.md` | erDiagram Mermaid con todas las tablas | ✅ |
+| `docs/despliegue.md` | Pipeline + runbook de deploy local y K8s | ✅ |
+| `docs/seguridad.md` | Mapeo OWASP Top 10 + cómo se mitiga cada uno | ✅ |
+| `docs/prompts/README.md` | Índice del catálogo + reglas de uso | ✅ |
+| `docs/prompts/arquitectura/` | Prompts usados para diseñar entidades, C4, etc. | ✅ |
+| `docs/prompts/codigo/` | Prompts usados para scaffolding, handlers, NATS, etc. | ✅ |
+| `docs/prompts/tests/` | Prompts para generar tests unitarios e integración | ✅ |
 
 ### README.md raíz
 | Tarea | Estado |
@@ -208,10 +229,10 @@ Notas: algunas tareas puntuales (p. ej. branch protection en `PeoplePortal-BackE
 | Rol | README dice | Estado |
 |-----|-------------|--------|
 | `employee` | Consulta info, crea solicitudes | ✅ |
-| `jefe_inmediato` | Aprueba vacaciones/permisos de su equipo | ❌ |
-| `hr` | Administra colaboradores, docs, solicitudes | ⚠️ (solo parcial) |
-| `nomina` | Carga vouchers de pago | ❌ |
-| `admin` | Gestiona usuarios, roles, permisos | ❌ |
+| `jefe_inmediato` | Aprueba vacaciones/permisos de su equipo | ✅ |
+| `hr` | Administra colaboradores, docs, solicitudes | ✅ |
+| `nomina` | Carga vouchers de pago | ✅ |
+| `admin` | Gestiona usuarios, roles, permisos | ✅ |
 
 ### Tareas de seguridad
 | Tarea | Detalle |
