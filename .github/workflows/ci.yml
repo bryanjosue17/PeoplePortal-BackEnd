@@ -16,7 +16,6 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository_owner }}/peopleportal-api
   IMAGE_NAME_MIGRATIONS: ${{ github.repository_owner }}/peopleportal-api-migrations
-  K8S_NAMESPACE: peopleportal
 
 jobs:
   build-test:
@@ -109,42 +108,4 @@ jobs:
           tags: ${{ steps.meta.outputs.tags_migrations }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  deploy:
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    needs: docker
-    runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v4
-        with:
-          version: latest
-
-      - name: Configure K8s context
-        if: ${{ secrets.KUBECONFIG != '' }}
-        uses: azure/k8s-set-context@v4
-        with:
-          method: kubeconfig
-          kubeconfig: ${{ secrets.KUBECONFIG }}
-
-      - name: Update image tags in manifests
-        if: ${{ secrets.KUBECONFIG != '' }}
-        run: |
-          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
-          sed -i "s|image: peopleportal-api:latest|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${SHORT_SHA}|" k8s/api.yaml
-          sed -i "s|imagePullPolicy: Never|imagePullPolicy: Always|" k8s/api.yaml
-          sed -i "s|image: peopleportal-api-migrations:latest|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_MIGRATIONS }}:${SHORT_SHA}|" k8s/migration-job.yaml
-          sed -i "s|imagePullPolicy: Never|imagePullPolicy: Always|" k8s/migration-job.yaml
-
-      - name: Deploy to K8s
-        if: ${{ secrets.KUBECONFIG != '' }}
-        run: |
-          kubectl apply -f k8s/namespace.yaml
-          kubectl apply -f k8s/configmap.yaml
-          kubectl apply -f k8s/secret.yaml
-          kubectl apply -f k8s/migration-job.yaml
-          kubectl apply -f k8s/api.yaml
-          kubectl rollout status deployment/peopleportal-api -n ${{ env.K8S_NAMESPACE }} --timeout=120s
