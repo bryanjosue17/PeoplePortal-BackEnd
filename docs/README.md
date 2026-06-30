@@ -137,6 +137,15 @@ flowchart TD
 | **AnnouncementsController** | GET | `/api/announcements` | EmployeePolicy |
 | | POST | `/api/hr/announcements` | HrPolicy |
 | **BenefitsController** | GET | `/api/benefits` | EmployeePolicy |
+| **HrBenefitsController** | GET | `/api/hr/benefits` | HrPolicy |
+| | POST | `/api/hr/benefits` | HrPolicy |
+| | PUT | `/api/hr/benefits/{id}` | HrPolicy |
+| | DELETE | `/api/hr/benefits/{id}` | HrPolicy |
+| **ReportsController** | GET | `/api/hr/reports/requests-by-status` | HrPolicy |
+| | GET | `/api/hr/reports/requests-by-type` | HrPolicy |
+| | GET | `/api/hr/reports/requests-over-time` | HrPolicy |
+| | GET | `/api/hr/reports/active-employees` | HrPolicy |
+| | GET | `/api/hr/reports/pending-documents` | HrPolicy |
 | **EmployeesController** | GET | `/api/employees/me` | EmployeePolicy |
 | | PUT | `/api/employees/me` | EmployeePolicy |
 | | GET | `/api/hr/employees` | HrPolicy |
