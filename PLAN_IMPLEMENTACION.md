@@ -12,9 +12,9 @@
 ## Acciones recientes en el workspace
 
 - Se creó el repositorio raíz `ProyectoIA-Forza` y se añadieron los submódulos: `PeoplePortal-BackEnd`, `PeoplePortal-FrontEnd-Colaborador`, `PeoplePortal-FrontEnd-RRHH`.
-- Se crearon y subieron las ramas `main` y `develop` en el monorepo y en los submódulos (siendo `develop` la rama de trabajo).
+- Se crearon y subieron las ramas `main` y `develop` en el repositorio raíz y en los submódulos (siendo `develop` la rama de trabajo).
 - Se eliminó la rama remota `master` en los repos front-end y se estandarizó a `main`/`develop`.
-- Se actualizó el `README.md` raíz con instrucciones de monorepo y se agregó `CONTRIBUTING.md` con el flujo de trabajo.
+- Se actualizó el `README.md` raíz con instrucciones del repositorio raíz y se agregó `CONTRIBUTING.md` con el flujo de trabajo.
 - Se activó protección de rama sobre `develop` en el repo `ProyectoIA-Forza`.
 - Se corrigió `MapInboundClaims` y `ValidIssuer` en `Program.cs` para compatibilidad Keycloak.
 - Se agregó `audience-peopleportal-api` mapper al cliente Keycloak frontend.
@@ -60,7 +60,7 @@ Observaciones:
 | CD: build + push Docker image a GHCR | ✅ | Jobs `docker` en los 3 CIs: build+push con tags branch y short-sha |
 | CD: deploy a K8s | ❌ | Bloqueado: GitHub runners no tienen acceso al cluster local (Docker Desktop) |
 | Codacy — issues críticos/altos en 0 | ⚠️ | Backend reporta, frontends ahora también con `@vitest/coverage-v8` |
-| Cobertura ≥ 60% | ✅ | 86 tests total: Backend 49 + FE-Colaborador 19 + FE-RRHH 18 |
+| Cobertura ≥ 60% | ❌ | 4% línea / 6.6% rama (faltan tests de Application) |
 
 ---
 
@@ -214,8 +214,8 @@ Observaciones:
 ### README.md raíz
 | Tarea | Estado |
 |-------|--------|
-| Actualizar con prerequisitos, comandos, variables de entorno | ✅ (actualizado en el monorepo raíz) |
-| Agregar matriz de cumplimiento (Anexo B del Brief) | ✅ (presente en el monorepo raíz) |
+| Actualizar con prerequisitos, comandos, variables de entorno | ✅ (actualizado en el repositorio raíz) |
+| Agregar matriz de cumplimiento (Anexo B del Brief) | ✅ (presente en el repositorio raíz) |
 | Agregar screenshots / enlaces | ❌ |
 
 ---

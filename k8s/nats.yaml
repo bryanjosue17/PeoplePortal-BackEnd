@@ -15,14 +15,20 @@ spec:
       labels:
         app: nats
     spec:
+      volumes:
+        - name: jetstream-data
+          emptyDir: {}
       containers:
         - name: nats
           image: nats:alpine
           imagePullPolicy: IfNotPresent
-          args: ["-js", "-m", "8222"]
+          args: ["-js", "-m", "8222", "-sd", "/data/jetstream"]
           ports:
             - containerPort: 4222
             - containerPort: 8222
+          volumeMounts:
+            - name: jetstream-data
+              mountPath: /data/jetstream
           resources:
             requests:
               memory: "64Mi"

@@ -159,7 +159,7 @@ flowchart TD
 ## 5. Estructura del Proyecto
 
 ```
-BackEnd/
+PeoplePortal-BackEnd/
 ├── PeoplePortal.sln
 ├── Dockerfile
 ├── docker-compose.yml
