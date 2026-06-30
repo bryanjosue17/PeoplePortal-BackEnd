@@ -124,12 +124,14 @@ jobs:
           version: latest
 
       - name: Configure K8s context
+        if: ${{ secrets.KUBECONFIG != '' }}
         uses: azure/k8s-set-context@v4
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBECONFIG }}
 
       - name: Update image tags in manifests
+        if: ${{ secrets.KUBECONFIG != '' }}
         run: |
           SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
           sed -i "s|image: peopleportal-api:latest|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${SHORT_SHA}|" k8s/api.yaml
@@ -138,6 +140,7 @@ jobs:
           sed -i "s|imagePullPolicy: Never|imagePullPolicy: Always|" k8s/migration-job.yaml
 
       - name: Deploy to K8s
+        if: ${{ secrets.KUBECONFIG != '' }}
         run: |
           kubectl apply -f k8s/namespace.yaml
           kubectl apply -f k8s/configmap.yaml
