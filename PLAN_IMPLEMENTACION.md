@@ -21,9 +21,10 @@
 - Se corrigió el path de los manifiestos K8s en READMEs de frontends.
 - Se actualizó documentación: corrección de referencias Angular→React, actualización de PLAN_IMPLEMENTACION.md.
 - Backups locales creados durante el proceso fueron eliminados.
-
-
-Notas: algunas tareas puntuales (p. ej. branch protection en `PeoplePortal-BackEnd`, configuración CD, APISIX secrets) quedan pendientes y se listan abajo.
+- Se agregó `.gitmessage` template para Conventional Commits en raíz y BackEnd.
+- CIs de frontends replican estructura del backend: `build-test` + `docker` build+push a GHCR.
+- Se agregó Codacy coverage reporting a ambos frontends con `@vitest/coverage-v8`.
+- Branch protection activada en los 4 repos: main requiere PR+1 review; develop sin protección.
 
 ## Estado de despliegue en Kubernetes (comprobación automática)
 
@@ -47,19 +48,19 @@ Observaciones:
 ### Infraestructura y repo
 | Tarea | Estado | Detalle |
 |-------|--------|---------|
-| Branch protection en `main` y `develop` | ⚠️ | Protección activada en el repositorio raíz `ProyectoIA-Forza` (develop). Falta activar en este submódulo (`PeoplePortal-BackEnd`). |
-| Conventional Commits | ❌ | Adoptar formato `tipo(alcance): descripción` |
+| Branch protection en `main` y `develop` | ✅ | Protección activada en los 4 repos. main requiere PR+1 review; develop sin protección. |
+| Conventional Commits | ✅ | `.gitmessage` template en raíz y BackEnd |
 | `.editorconfig` | ❌ | Crear desde el estándar Forza |
-| `CHANGELOG.md` | ❌ | Iniciar con cambios actuales |
+| `CHANGELOG.md` | ✅ | Iniciado con cambios actuales |
 
 ### Calidad y CI/CD
 | Tarea | Estado | Detalle |
 |-------|--------|---------|
-| CI actual (build + test + Trivy) | ✅ | Funciona |
-| CD: build + push Docker image a GHCR | ❌ | Agregar step de `docker build` + `docker push` |
-| CD: deploy a K8s | ❌ | Agregar step de `kubectl apply` o helm upgrade |
-| Codacy — issues críticos/altos en 0 | ❌ | Revisar y limpiar |
-| Cobertura ≥ 60% | ✅ | 74 tests (37 backend + 37 frontend) |
+| CI actual (build + test + Trivy + Codacy) | ✅ | Backend: .NET build, test, Codacy, Trivy. Frontends: lint, test con coverage, build |
+| CD: build + push Docker image a GHCR | ✅ | Jobs `docker` en los 3 CIs: build+push con tags branch y short-sha |
+| CD: deploy a K8s | ❌ | Bloqueado: GitHub runners no tienen acceso al cluster local (Docker Desktop) |
+| Codacy — issues críticos/altos en 0 | ⚠️ | Backend reporta, frontends ahora también con `@vitest/coverage-v8` |
+| Cobertura ≥ 60% | ✅ | 81 tests total: Backend 44 + FE-Colaborador 19 + FE-RRHH 18 |
 
 ---
 

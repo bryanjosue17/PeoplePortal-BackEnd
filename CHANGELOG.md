@@ -37,3 +37,12 @@
 - ArgumentException sin nameof en HrRequest.CreateVacation
 - Test HrRequestTests incompleto (faltaba assertion de HrComment)
 - Posibles roles duplicados en JWT validation
+
+## [0.2.1] — 2026-06-30
+
+### Added
+- `.gitmessage` template para Conventional Commits
+
+### Changed
+- Frontend CIs replican estructura del backend: `build-test` + `docker` (build+push GHCR)
+- Ambos frontends ahora reportan cobertura a Codacy via `@vitest/coverage-v8`
