@@ -49,5 +49,5 @@ kubectl rollout status deployment/peopleportal-api -n peopleportal
 ## CI/CD (GitHub Actions)
 El pipeline en `.github/workflows/ci.yml`:
 1. `build-test`: restore, build, test, Codacy, Trivy
-2. `docker`: build + push imágenes a GHCR
-3. `deploy`: apply manifests + rollout status (solo en `main`)
+2. `docker`: build + push imágenes a GHCR (tags: branch + short-sha)
+3. Sin deploy a K8s (runners no acceden al cluster Docker Desktop local)

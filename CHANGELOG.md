@@ -37,3 +37,20 @@
 - ArgumentException sin nameof en HrRequest.CreateVacation
 - Test HrRequestTests incompleto (faltaba assertion de HrComment)
 - Posibles roles duplicados en JWT validation
+
+## [0.2.1] — 2026-06-30
+
+### Added
+- `.gitmessage` template para Conventional Commits
+- **Benefits CRUD**: `HrBenefitsController` con GET/POST/PUT/DELETE protegido con HrPolicy
+- **Reports API**: `ReportsController` con 5 endpoints (requests-by-status, requests-by-type, requests-over-time, active-employees, pending-documents)
+- **Integration Tests**: nuevo proyecto `PeoplePortal.IntegrationTests` con 5 tests de dominio
+- `CreateBenefitCommand`, `UpdateBenefitCommand`, `DeactivateBenefitCommand` + handlers
+- `GetAllBenefitsQuery` + handler (incluye beneficios inactivos)
+- 5 report queries con handlers y DTOs
+
+### Changed
+- Frontend CIs replican estructura del backend: `build-test` + `docker` (build+push GHCR)
+- Ambos frontends ahora reportan cobertura a Codacy via `@vitest/coverage-v8`
+- `.sln` incluye `PeoplePortal.IntegrationTests`
+- Total tests: 86 (49 backend + 19 colaborador + 18 RRHH)

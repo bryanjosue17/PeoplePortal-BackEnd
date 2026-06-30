@@ -21,9 +21,10 @@
 - Se corrigió el path de los manifiestos K8s en READMEs de frontends.
 - Se actualizó documentación: corrección de referencias Angular→React, actualización de PLAN_IMPLEMENTACION.md.
 - Backups locales creados durante el proceso fueron eliminados.
-
-
-Notas: algunas tareas puntuales (p. ej. branch protection en `PeoplePortal-BackEnd`, configuración CD, APISIX secrets) quedan pendientes y se listan abajo.
+- Se agregó `.gitmessage` template para Conventional Commits en raíz y BackEnd.
+- CIs de frontends replican estructura del backend: `build-test` + `docker` build+push a GHCR.
+- Se agregó Codacy coverage reporting a ambos frontends con `@vitest/coverage-v8`.
+- Branch protection activada en los 4 repos: main requiere PR+1 review; develop sin protección.
 
 ## Estado de despliegue en Kubernetes (comprobación automática)
 
@@ -47,19 +48,19 @@ Observaciones:
 ### Infraestructura y repo
 | Tarea | Estado | Detalle |
 |-------|--------|---------|
-| Branch protection en `main` y `develop` | ⚠️ | Protección activada en el repositorio raíz `ProyectoIA-Forza` (develop). Falta activar en este submódulo (`PeoplePortal-BackEnd`). |
-| Conventional Commits | ❌ | Adoptar formato `tipo(alcance): descripción` |
+| Branch protection en `main` y `develop` | ✅ | Protección activada en los 4 repos. main requiere PR+1 review; develop sin protección. |
+| Conventional Commits | ✅ | `.gitmessage` template en raíz y BackEnd |
 | `.editorconfig` | ❌ | Crear desde el estándar Forza |
-| `CHANGELOG.md` | ❌ | Iniciar con cambios actuales |
+| `CHANGELOG.md` | ✅ | Iniciado con cambios actuales |
 
 ### Calidad y CI/CD
 | Tarea | Estado | Detalle |
 |-------|--------|---------|
-| CI actual (build + test + Trivy) | ✅ | Funciona |
-| CD: build + push Docker image a GHCR | ❌ | Agregar step de `docker build` + `docker push` |
-| CD: deploy a K8s | ❌ | Agregar step de `kubectl apply` o helm upgrade |
-| Codacy — issues críticos/altos en 0 | ❌ | Revisar y limpiar |
-| Cobertura ≥ 60% | ✅ | 74 tests (37 backend + 37 frontend) |
+| CI actual (build + test + Trivy + Codacy) | ✅ | Backend: .NET build, test, Codacy, Trivy. Frontends: lint, test con coverage, build |
+| CD: build + push Docker image a GHCR | ✅ | Jobs `docker` en los 3 CIs: build+push con tags branch y short-sha |
+| CD: deploy a K8s | ❌ | Bloqueado: GitHub runners no tienen acceso al cluster local (Docker Desktop) |
+| Codacy — issues críticos/altos en 0 | ⚠️ | Backend reporta, frontends ahora también con `@vitest/coverage-v8` |
+| Cobertura ≥ 60% | ✅ | 86 tests total: Backend 49 + FE-Colaborador 19 + FE-RRHH 18 |
 
 ---
 
@@ -201,18 +202,14 @@ Observaciones:
 
 ## Fase 5 — Documentación (Semana 3, ~2h)
 
-### Carpeta `docs/`
-| Archivo | Contenido | Estado |
-|---------|-----------|--------|
-| `docs/arquitectura.md` | Diagrama C4 N1 + N2 en Mermaid | ✅ |
-| `docs/flujos.md` | Diagramas sequence: crear solicitud, aprobar, subir documento | ✅ |
-| `docs/base-de-datos.md` | erDiagram Mermaid con todas las tablas | ✅ |
-| `docs/despliegue.md` | Pipeline + runbook de deploy local y K8s | ✅ |
-| `docs/seguridad.md` | Mapeo OWASP Top 10 + cómo se mitiga cada uno | ✅ |
-| `docs/prompts/README.md` | Índice del catálogo + reglas de uso | ✅ |
-| `docs/prompts/arquitectura/` | Prompts usados para diseñar entidades, C4, etc. | ✅ |
-| `docs/prompts/codigo/` | Prompts usados para scaffolding, handlers, NATS, etc. | ✅ |
-| `docs/prompts/tests/` | Prompts para generar tests unitarios e integración | ✅ |
+### Nuevas funcionalidades implementadas
+| Funcionalidad | Estado | Detalle |
+|---------------|--------|---------|
+| **Benefits CRUD (HR)** | ✅ | `HrBenefitsController`: GET list (todos), POST crear, PUT editar, DELETE desactivar |
+| **Reports API** | ✅ | `ReportsController`: 5 endpoints con agrupaciones y conteos |
+| **Integration Tests** | ✅ | `PeoplePortal.IntegrationTests`: 5 tests de dominio con xUnit |
+| **Frontend Benefits CRUD** | ✅ | Diálogos crear/editar, botón desactivar, UI con cards |
+| **Frontend Reports + PDF** | ✅ | Página con 5 reportes + descarga PDF via `@react-pdf/renderer` |
 
 ### README.md raíz
 | Tarea | Estado |
@@ -258,12 +255,14 @@ Observaciones:
 | Validators | FluentValidation tests | 1 c/u |
 
 ### Tests de integración
-| Escenario | Descripción |
-|-----------|-------------|
-| Crear solicitud + verificar en BD | Testcontainers para SQL Server |
-| Flujo completo: solicitar → aprobar → descargar | |
-| Autenticación: sin token → 401 | |
-| Autorización: employee → endpoint hr → 403 | |
+| Escenario | Descripción | Estado |
+|-----------|-------------|--------|
+| Creación de entidades de dominio | Benefit.Create, Employee.Create, HrRequest.CreateVacation | ✅ |
+| Validación de valores de enums | DocumentStatus, EmployeeStatus | ✅ |
+| Testcontainers para SQL Server | Pendiente para flujos completos API+BD | ❌ |
+| Flujo completo: solicitar → aprobar → descargar | Pendiente | ❌ |
+| Autenticación: sin token → 401 | Pendiente | ❌ |
+| Autorización: employee → endpoint hr → 403 | Pendiente | ❌ |
 
 ### Meta de cobertura
 | Objetivo | Actual | Meta |
