@@ -132,8 +132,8 @@ jobs:
       - name: Update image tags in manifests
         run: |
           SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
-          sed -i "s|image: peopleportal-api:latest|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${SHORT_SHA}|" k8s/api-deployment.yaml
-          sed -i "s|imagePullPolicy: Never|imagePullPolicy: Always|" k8s/api-deployment.yaml
+          sed -i "s|image: peopleportal-api:latest|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${SHORT_SHA}|" k8s/api.yaml
+          sed -i "s|imagePullPolicy: Never|imagePullPolicy: Always|" k8s/api.yaml
           sed -i "s|image: peopleportal-api-migrations:latest|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_MIGRATIONS }}:${SHORT_SHA}|" k8s/migration-job.yaml
           sed -i "s|imagePullPolicy: Never|imagePullPolicy: Always|" k8s/migration-job.yaml
 
@@ -142,7 +142,6 @@ jobs:
           kubectl apply -f k8s/namespace.yaml
           kubectl apply -f k8s/configmap.yaml
           kubectl apply -f k8s/secret.yaml
-          kubectl apply -f k8s/sqlserver.yaml
           kubectl apply -f k8s/migration-job.yaml
-          kubectl apply -f k8s/api-deployment.yaml
+          kubectl apply -f k8s/api.yaml
           kubectl rollout status deployment/peopleportal-api -n ${{ env.K8S_NAMESPACE }} --timeout=120s

@@ -54,7 +54,7 @@ graph TB
 
 ```mermaid
 sequenceDiagram
-    participant C as Cliente (Angular)
+    participant C as Cliente (React)
     participant API as PeoplePortal API
     participant MediatR as MediatR Pipeline
     participant Handler as Command Handler

@@ -31,7 +31,7 @@ kubectl apply -f k8s/configmap.yaml
 kubectl apply -f k8s/secret.yaml
 
 # Base de datos
-kubectl apply -f k8s/sqlserver.yaml
+# SQL Server corre local en Windows (no en K8s)
 
 # Migraciones
 kubectl apply -f k8s/migration-job.yaml
