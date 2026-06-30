@@ -11,6 +11,6 @@ public sealed class GetMyRequestsQueryHandler(IHrRequestRepository repository)
     public async Task<IReadOnlyList<HrRequestDto>> Handle(GetMyRequestsQuery request, CancellationToken cancellationToken)
     {
         var entities = await repository.GetByEmployeeIdAsync(request.EmployeeId, cancellationToken);
-        return entities.Select(x => x.ToDto()).ToList();
+        return entities.Select(x => x.ToDto()).ToArray();
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PeoplePortal.Api.Contracts;
 using PeoplePortal.Api.Extensions;
 using PeoplePortal.Application.Requests.Commands.UpdateRequestStatus;
+using PeoplePortal.Application.Requests.Queries.GetAllRequests;
 using PeoplePortal.Domain.Enums;
 
 namespace PeoplePortal.Api.Controllers;
@@ -13,6 +14,13 @@ namespace PeoplePortal.Api.Controllers;
 [Authorize(Policy = "HrPolicy")]
 public class HrRequestsController(IMediator mediator) : ControllerBase
 {
+    [HttpGet]
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    {
+        var result = await mediator.Send(new GetAllRequestsQuery(), cancellationToken);
+        return Ok(result);
+    }
+
     [HttpPatch("{id:guid}/status")]
     public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateRequestStatusBody body, CancellationToken cancellationToken)
     {

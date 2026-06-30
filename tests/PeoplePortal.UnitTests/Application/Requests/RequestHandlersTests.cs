@@ -1,5 +1,6 @@
 using FluentAssertions;
 using NSubstitute;
+using PeoplePortal.Application.Common.Interfaces;
 using PeoplePortal.Application.Contracts.Persistence;
 using PeoplePortal.Application.Requests.Commands.CreateCertificateRequest;
 using PeoplePortal.Application.Requests.Commands.CreateVacationRequest;
@@ -16,9 +17,11 @@ public class RequestHandlersTests
     public async Task CreateVacationHandler_ShouldPersistAndReturnDto()
     {
         var repository = Substitute.For<IHrRequestRepository>();
-        var handler = new CreateVacationRequestCommandHandler(repository);
+        var eventBus = Substitute.For<IEventBus>();
+        var handler = new CreateVacationRequestCommandHandler(repository, eventBus);
         var command = new CreateVacationRequestCommand(
             "employee-1",
+            null,
             new DateOnly(2026, 7, 1),
             new DateOnly(2026, 7, 5),
             "Family trip");
@@ -37,13 +40,18 @@ public class RequestHandlersTests
             Arg.Any<CancellationToken>());
 
         await repository.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await eventBus.Received(1).PublishAsync(
+            "hr.request.submitted",
+            Arg.Any<object>(),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task CreateCertificateHandler_ShouldPersistAndReturnDto()
     {
         var repository = Substitute.For<IHrRequestRepository>();
-        var handler = new CreateCertificateRequestCommandHandler(repository);
+        var eventBus = Substitute.For<IEventBus>();
+        var handler = new CreateCertificateRequestCommandHandler(repository, eventBus);
         var command = new CreateCertificateRequestCommand(
             "employee-2",
             "Constancia laboral",
@@ -64,19 +72,24 @@ public class RequestHandlersTests
             Arg.Any<CancellationToken>());
 
         await repository.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await eventBus.Received(1).PublishAsync(
+            "hr.request.submitted",
+            Arg.Any<object>(),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task UpdateRequestStatusHandler_ShouldUpdateEntityAndPersist()
     {
         var repository = Substitute.For<IHrRequestRepository>();
+        var eventBus = Substitute.For<IEventBus>();
         var existingRequest = HrRequest.CreateCertificate("employee-3", "Carta salarial", "Banco");
 
         repository
             .GetByIdAsync(existingRequest.Id, Arg.Any<CancellationToken>())
             .Returns(existingRequest);
 
-        var handler = new UpdateRequestStatusCommandHandler(repository);
+        var handler = new UpdateRequestStatusCommandHandler(repository, eventBus);
         var command = new UpdateRequestStatusCommand(
             existingRequest.Id,
             RequestStatus.Approved,
@@ -90,19 +103,24 @@ public class RequestHandlersTests
         existingRequest.Status.Should().Be(RequestStatus.Approved);
 
         await repository.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        await eventBus.Received(1).PublishAsync(
+            "hr.request.approved",
+            Arg.Any<object>(),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task UpdateRequestStatusHandler_WhenRequestNotFound_ShouldThrow()
     {
         var repository = Substitute.For<IHrRequestRepository>();
+        var eventBus = Substitute.For<IEventBus>();
         var requestId = Guid.NewGuid();
 
         repository
             .GetByIdAsync(requestId, Arg.Any<CancellationToken>())
             .Returns((HrRequest?)null);
 
-        var handler = new UpdateRequestStatusCommandHandler(repository);
+        var handler = new UpdateRequestStatusCommandHandler(repository, eventBus);
         var command = new UpdateRequestStatusCommand(
             requestId,
             RequestStatus.Approved,
@@ -113,6 +131,10 @@ public class RequestHandlersTests
 
         await act.Should().ThrowAsync<KeyNotFoundException>();
         await repository.DidNotReceive().SaveChangesAsync(Arg.Any<CancellationToken>());
+        await eventBus.DidNotReceive().PublishAsync(
+            Arg.Any<string>(),
+            Arg.Any<object>(),
+            Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -122,7 +144,7 @@ public class RequestHandlersTests
         var employeeId = "employee-4";
         var requests = new List<HrRequest>
         {
-            HrRequest.CreateVacation(employeeId, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 3), "Trip"),
+            HrRequest.CreateVacation(employeeId, null, new DateOnly(2026, 8, 1), new DateOnly(2026, 8, 3), "Trip"),
             HrRequest.CreateCertificate(employeeId, "Constancia laboral", "Bank")
         };
 

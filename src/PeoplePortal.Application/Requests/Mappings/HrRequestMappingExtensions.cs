@@ -15,6 +15,7 @@ public static class HrRequestMappingExtensions
             request.VacationStartDate,
             request.VacationEndDate,
             request.CertificateType,
+            request.Period,
             request.Reason,
             request.HrComment,
             request.ReviewedBy,

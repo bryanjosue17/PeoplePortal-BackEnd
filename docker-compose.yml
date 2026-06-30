@@ -29,6 +29,15 @@ services:
       - sqlserver-data:/var/opt/mssql
     restart: unless-stopped
 
+  nats:
+    image: nats:latest
+    container_name: peopleportal-nats
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    command: ["-js"]
+    restart: unless-stopped
+
   migrate:
     build:
       context: .
@@ -41,6 +50,27 @@ services:
       - sqlserver
     environment:
       ConnectionStrings__DefaultConnection: Server=sqlserver,1433;Database=PeoplePortalDb;User Id=sa;Password=${SA_PASSWORD:-YourStrong@Passw0rd};TrustServerCertificate=True;
+
+  etcd:
+    image: bitnami/etcd:3.5
+    container_name: peopleportal-etcd
+    environment:
+      ETCD_ENABLE_V2: "true"
+      ALLOW_NONE_AUTHENTICATION: "yes"
+    ports:
+      - "2379:2379"
+
+  apisix:
+    image: apache/apisix:3.9
+    container_name: peopleportal-apisix
+    depends_on:
+      - etcd
+    ports:
+      - "9080:9080"
+      - "9180:9180"
+    volumes:
+      - ./deploy/apisix/config.yaml:/usr/local/apisix/conf/config.yaml:ro
+    restart: unless-stopped
 
 volumes:
   sqlserver-data:

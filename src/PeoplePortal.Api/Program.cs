@@ -1,12 +1,18 @@
 using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PeoplePortal.Application;
 using PeoplePortal.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<HostOptions>(options =>
+{
+    options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore;
+});
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -50,15 +56,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.Authority = keycloakAuthority;
         options.Audience = keycloakAudience;
-        options.RequireHttpsMetadata = false;
+        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateAudience = true,
-            ValidateIssuer = true,
+            ValidAudience = keycloakAudience,
+            ValidateIssuer = false,
             ValidateIssuerSigningKey = true,
             ClockSkew = TimeSpan.FromMinutes(1),
             NameClaimType = "preferred_username",
-            RoleClaimType = "roles"
+            RoleClaimType = ClaimTypes.Role
         };
         options.Events = new JwtBearerEvents
         {
@@ -82,10 +89,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     return Task.CompletedTask;
                 }
 
+                var existingRoles = new HashSet<string>(
+                    identity.FindAll(ClaimTypes.Role).Select(c => c.Value));
+
                 foreach (var role in rolesElement.EnumerateArray())
                 {
                     var roleValue = role.GetString();
-                    if (!string.IsNullOrWhiteSpace(roleValue))
+                    if (!string.IsNullOrWhiteSpace(roleValue) && existingRoles.Add(roleValue))
                     {
                         identity.AddClaim(new Claim(ClaimTypes.Role, roleValue));
                     }
@@ -101,8 +111,28 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("EmployeePolicy", policy =>
         policy.RequireAuthenticatedUser().RequireRole("employee"));
 
+    options.AddPolicy("ManagerPolicy", policy =>
+        policy.RequireAuthenticatedUser().RequireRole("jefe_inmediato"));
+
     options.AddPolicy("HrPolicy", policy =>
         policy.RequireAuthenticatedUser().RequireRole("hr"));
+
+    options.AddPolicy("NominaPolicy", policy =>
+        policy.RequireAuthenticatedUser().RequireRole("nomina"));
+
+    options.AddPolicy("AdminPolicy", policy =>
+        policy.RequireAuthenticatedUser().RequireRole("admin"));
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200", "http://localhost:3000", "http://localhost:5173", "http://localhost:5174")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
 });
 
 builder.Services.AddHealthChecks();
@@ -115,6 +145,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<PeoplePortal.Api.Middleware.ExceptionHandlingMiddleware>();
+app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

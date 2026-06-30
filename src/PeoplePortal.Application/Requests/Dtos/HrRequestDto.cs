@@ -8,6 +8,7 @@ public sealed record HrRequestDto(
     DateOnly? VacationStartDate,
     DateOnly? VacationEndDate,
     string? CertificateType,
+    string? Period,
     string? Reason,
     string? HrComment,
     string? ReviewedBy,

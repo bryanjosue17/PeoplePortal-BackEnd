@@ -10,8 +10,13 @@ public class PeoplePortalDbContextFactory : IDesignTimeDbContextFactory<PeoplePo
         var optionsBuilder = new DbContextOptionsBuilder<PeoplePortalDbContext>();
         var connectionString =
             Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") ??
-            Environment.GetEnvironmentVariable("ConnectionStrings:DefaultConnection") ??
-            "Server=.\\SQLEXPRESS;Database=PeoplePortalDb;Trusted_Connection=True;TrustServerCertificate=True;";
+            Environment.GetEnvironmentVariable("ConnectionStrings:DefaultConnection");
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new InvalidOperationException(
+                "Connection string not found. Set ConnectionStrings__DefaultConnection or ConnectionStrings:DefaultConnection.");
+        }
 
         optionsBuilder.UseSqlServer(connectionString);
 

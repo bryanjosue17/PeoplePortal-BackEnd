@@ -8,3 +8,4 @@ data:
   ASPNETCORE_URLS: "http://+:8080"
   Authentication__Authority: "http://keycloak-service:8080/realms/peopleportal"
   Authentication__Audience: "peopleportal-api"
+  Nats__Url: "nats://nats-service:4222"

@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on:
   push:
@@ -9,6 +9,14 @@ on:
 
 permissions:
   contents: read
+  packages: write
+
+env:
+  DOTNET_VERSION: 9.0.x
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/peopleportal-api
+  IMAGE_NAME_MIGRATIONS: ${{ github.repository_owner }}/peopleportal-api-migrations
+  K8S_NAMESPACE: peopleportal
 
 jobs:
   build-test:
@@ -23,7 +31,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.x
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore
         run: dotnet restore PeoplePortal.sln
@@ -46,7 +54,7 @@ jobs:
           bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r "$COVERAGE_FILE"
 
       - name: Trivy FS Scan
-        uses: aquasecurity/trivy-action@v0.24.0
+        uses: aquasecurity/trivy-action@0.24.0
         with:
           scan-type: fs
           scan-ref: .
@@ -59,3 +67,82 @@ jobs:
           name: coverage-results
           path: '**/TestResults/**'
 
+  docker:
+    if: github.event_name != 'pull_request'
+    needs: build-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set tags and labels
+        id: meta
+        run: |
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          BRANCH_TAG=${{ github.ref_name }}
+          echo "tags=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${BRANCH_TAG},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${SHORT_SHA}" >> $GITHUB_OUTPUT
+          echo "tags_migrations=${{ env.REGISTRY }}/${{ env.IMAGE_NAME_MIGRATIONS }}:${BRANCH_TAG},${{ env.REGISTRY }}/${{ env.IMAGE_NAME_MIGRATIONS }}:${SHORT_SHA}" >> $GITHUB_OUTPUT
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          target: final
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Build and push migrations image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          target: migrations
+          tags: ${{ steps.meta.outputs.tags_migrations }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: latest
+
+      - name: Configure K8s context
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+
+      - name: Update image tags in manifests
+        run: |
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          sed -i "s|image: peopleportal-api:latest|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${SHORT_SHA}|" k8s/api-deployment.yaml
+          sed -i "s|imagePullPolicy: Never|imagePullPolicy: Always|" k8s/api-deployment.yaml
+          sed -i "s|image: peopleportal-api-migrations:latest|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_MIGRATIONS }}:${SHORT_SHA}|" k8s/migration-job.yaml
+          sed -i "s|imagePullPolicy: Never|imagePullPolicy: Always|" k8s/migration-job.yaml
+
+      - name: Deploy to K8s
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/configmap.yaml
+          kubectl apply -f k8s/secret.yaml
+          kubectl apply -f k8s/sqlserver.yaml
+          kubectl apply -f k8s/migration-job.yaml
+          kubectl apply -f k8s/api-deployment.yaml
+          kubectl rollout status deployment/peopleportal-api -n ${{ env.K8S_NAMESPACE }} --timeout=120s

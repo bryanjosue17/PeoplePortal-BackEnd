@@ -30,6 +30,7 @@ spec:
       containers:
         - name: sqlserver
           image: mcr.microsoft.com/mssql/server:2022-latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 1433
           env:
@@ -43,6 +44,13 @@ spec:
           volumeMounts:
             - name: sqlserver-data
               mountPath: /var/opt/mssql
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "1"
       volumes:
         - name: sqlserver-data
           persistentVolumeClaim:

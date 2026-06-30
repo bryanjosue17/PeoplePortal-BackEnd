@@ -1,0 +1,12 @@
+---
+engines:
+  rubocop:
+    enabled: false
+  duplication:
+    enabled: true
+    exclude_paths:
+      - tests/**
+  coverage:
+    enabled: true
+exclude_paths:
+  - '**/Migrations/**'
