@@ -9,12 +9,24 @@
 
 ---
 
+## Acciones recientes en el workspace
+
+- Se creó el monorepo `ProyectoIA-Forza` y se añadieron los submódulos: `PeoplePortal-BackEnd`, `PeoplePortal-FrontEnd-Colaborador`, `PeoplePortal-FrontEnd-RRHH`.
+- Se crearon y subieron las ramas `main` y `develop` en el monorepo y en los submódulos (siendo `develop` la rama de trabajo).
+- Se eliminó la rama remota `master` en los repos front-end y se estandarizó a `main`/`develop`.
+- Se actualizó el `README.md` raíz con instrucciones de monorepo y se agregó `CONTRIBUTING.md` con el flujo de trabajo.
+- Se activó protección de rama sobre `develop` en el repo `ProyectoIA-Forza`.
+- Backups locales creados durante el proceso fueron eliminados.
+
+Notas: algunas tareas puntuales (p. ej. branch protection en `PeoplePortal-BackEnd`, configuración CD, documentación interna del backend) quedan pendientes y se listan abajo.
+
+
 ## Fase 0 — Fundamentos (Semana 1, ~3h)
 
 ### Infraestructura y repo
 | Tarea | Estado | Detalle |
 |-------|--------|---------|
-| Branch protection en `main` y `develop` | ❌ | Configurar reglas: requerir PR, approvals, status checks |
+| Branch protection en `main` y `develop` | ⚠️ | Protección activada en el repo monorepo `ProyectoIA-Forza` (develop). Falta activar en este repo (`PeoplePortal-BackEnd`). |
 | Conventional Commits | ❌ | Adoptar formato `tipo(alcance): descripción` |
 | `.editorconfig` | ❌ | Crear desde el estándar Forza |
 | `CHANGELOG.md` | ❌ | Iniciar con cambios actuales |
@@ -184,8 +196,8 @@
 ### README.md raíz
 | Tarea | Estado |
 |-------|--------|
-| Actualizar con prerequisitos, comandos, variables de entorno | ❌ |
-| Agregar matriz de cumplimiento (Anexo B del Brief) | ❌ |
+| Actualizar con prerequisitos, comandos, variables de entorno | ✅ (actualizado en el monorepo raíz) |
+| Agregar matriz de cumplimiento (Anexo B del Brief) | ✅ (presente en el monorepo raíz) |
 | Agregar screenshots / enlaces | ❌ |
 
 ---
