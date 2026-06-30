@@ -5,7 +5,7 @@
 ```bash
 # Clonar repo
 git clone <repo-url>
-cd BackEnd
+cd PeoplePortal-BackEnd
 
 # Configurar variables
 $env:SA_PASSWORD = "YourStrong@Passw0rd"
@@ -31,13 +31,16 @@ kubectl apply -f k8s/configmap.yaml
 kubectl apply -f k8s/secret.yaml
 
 # Base de datos
-# SQL Server corre local en Windows (no en K8s)
+kubectl apply -f k8s/sqlserver.yaml
+
+# NATS JetStream
+kubectl apply -f k8s/nats.yaml
 
 # Migraciones
 kubectl apply -f k8s/migration-job.yaml
 
 # API
-kubectl apply -f k8s/api-deployment.yaml
+kubectl apply -f k8s/api.yaml
 
 # APISIX
 kubectl apply -f k8s/apisix.yaml
