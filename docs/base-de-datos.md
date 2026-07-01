@@ -1,6 +1,8 @@
-# Base de datos — PeoplePortal
+# Base de Datos — PeoplePortal
 
-Esquema SQL Server con naming snake_case.
+SQL Server 2022 con Entity Framework Core 9. Naming convention: `snake_case`.
+
+## Diagrama ER
 
 ```mermaid
 erDiagram
@@ -22,7 +24,7 @@ erDiagram
         datetime created_at_utc
         datetime updated_at_utc
     }
-    
+
     hr_requests {
         guid id PK
         string employee_id FK
@@ -38,7 +40,7 @@ erDiagram
         datetime created_at_utc
         datetime updated_at_utc
     }
-    
+
     documents {
         guid id PK
         string employee_id FK
@@ -50,7 +52,7 @@ erDiagram
         datetime uploaded_at
         string reviewed_by
     }
-    
+
     vouchers {
         guid id PK
         string employee_id FK
@@ -61,7 +63,7 @@ erDiagram
         datetime requested_at
         datetime updated_at_utc
     }
-    
+
     announcements {
         guid id PK
         string title
@@ -72,7 +74,7 @@ erDiagram
         string created_by
         boolean is_active
     }
-    
+
     benefits {
         guid id PK
         string name
@@ -80,16 +82,50 @@ erDiagram
         string type
         boolean is_active
     }
-    
+
     employees ||--o{ hr_requests : "employee_id"
     employees ||--o{ documents : "employee_id"
     employees ||--o{ vouchers : "employee_id"
 ```
 
+---
+
+## Tablas y descripción
+
+| Tabla | Descripción |
+|---|---|
+| `employees` | Colaboradores registrados en el sistema |
+| `hr_requests` | Solicitudes (vacaciones, constancias, vouchers, permisos) |
+| `documents` | Documentos del expediente digital del colaborador |
+| `vouchers` | Vouchers de pago solicitados/cargados por nómina |
+| `announcements` | Comunicados internos publicados por RRHH |
+| `benefits` | Catálogo de beneficios de la empresa |
+
+---
+
 ## Convenciones
-- Tablas en snake_case plural
-- Columnas en snake_case
-- Primary keys: `id`
-- Foreign keys: `{tabla}_id`
-- Índices: `ix_{tabla}_{columna}`
-- Timestamps en UTC
+
+| Convención | Ejemplo |
+|---|---|
+| Tablas en snake_case plural | `hr_requests` |
+| Columnas en snake_case | `employee_id`, `created_at_utc` |
+| Primary keys | `id` (GUID) |
+| Foreign keys | `{tabla_singular}_id` |
+| Índices | `ix_{tabla}_{columna}` |
+| Timestamps en UTC | `created_at_utc`, `updated_at_utc` |
+
+---
+
+## Migraciones EF Core
+
+```bash
+# Aplicar migraciones (docker-compose)
+docker-compose run --rm migrate
+
+# Aplicar migraciones (K8s)
+kubectl apply -f k8s/migration-job.yaml
+kubectl wait --for=condition=complete job/peopleportal-migrations \
+  -n peopleportal --timeout=180s
+```
+
+Las migraciones se encuentran en `src/PeoplePortal.Infrastructure/Persistence/Migrations/`.

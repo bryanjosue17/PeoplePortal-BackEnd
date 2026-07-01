@@ -1,56 +1,84 @@
-# Despliegue — PeoplePortal
+# Despliegue — PeoplePortal BackEnd
 
-## Local (docker-compose)
+## Local con docker-compose
 
 ```bash
-# Clonar repo
-git clone <repo-url>
 cd PeoplePortal-BackEnd
 
-# Configurar variables
-$env:SA_PASSWORD = "YourStrong@Passw0rd"
+# Variables requeridas
+$env:SA_PASSWORD  = "YourStrong@Passw0rd"
+$env:KEYCLOAK_URL = "http://localhost:8080"
 
-# Iniciar servicios
+# Levantar SQL Server + NATS + API
 docker-compose up -d
 
-# Correr migraciones
+# Aplicar migraciones
 docker-compose run --rm migrate
 
-# La API está en http://localhost:8081
-# Health check: http://localhost:8081/health
+# Verificar
+curl http://localhost:8081/health
 ```
 
-## Kubernetes
+Servicios levantados:
+
+| Servicio | Puerto local |
+|---|---|
+| API | 8081 |
+| SQL Server | 1433 |
+| NATS | 4222 |
+
+---
+
+## Kubernetes (Docker Desktop)
 
 ```bash
 # Namespace
 kubectl apply -f k8s/namespace.yaml
 
-# Config
+# Config y secretos
 kubectl apply -f k8s/configmap.yaml
 kubectl apply -f k8s/secret.yaml
 
-# Base de datos
+# Base de datos y mensajería
 kubectl apply -f k8s/sqlserver.yaml
-
-# NATS JetStream
 kubectl apply -f k8s/nats.yaml
 
-# Migraciones
+# Migraciones (esperar a que completen)
 kubectl apply -f k8s/migration-job.yaml
+kubectl wait --for=condition=complete job/peopleportal-migrations \
+  -n peopleportal --timeout=180s
 
 # API
 kubectl apply -f k8s/api.yaml
 
-# APISIX
-kubectl apply -f k8s/apisix.yaml
-
 # Verificar
 kubectl rollout status deployment/peopleportal-api -n peopleportal
+kubectl get pods -n peopleportal
 ```
 
+---
+
+## Variables de entorno requeridas
+
+| Variable | Descripción | Ejemplo |
+|---|---|---|
+| `SA_PASSWORD` | Contraseña SA de SQL Server | `YourStrong@Passw0rd` |
+| `ConnectionStrings__DefaultConnection` | Connection string completa | `Server=...` |
+| `Keycloak__Authority` | URL del realm Keycloak | `http://keycloak:8080/realms/peopleportal` |
+| `Keycloak__Audience` | Audience del JWT | `peopleportal-api` |
+| `NATS__Url` | URL del servidor NATS | `nats://nats-service:4222` |
+
+---
+
 ## CI/CD (GitHub Actions)
-El pipeline en `.github/workflows/ci.yml`:
-1. `build-test`: restore, build, test, Codacy, Trivy
-2. `docker`: build + push imágenes a GHCR (tags: branch + short-sha)
-3. Sin deploy a K8s (runners no acceden al cluster Docker Desktop local)
+
+Pipeline: `.github/workflows/ci.yml`
+
+| Job | Trigger | Acciones |
+|---|---|---|
+| `build-test` | Push a cualquier rama | restore → build → dotnet test (cobertura XPlat) → Codacy → Trivy |
+| `docker` | Push a `develop` / `main` | docker build → push a GHCR |
+
+Tags de imagen: `{branch}-{short-sha}` y `latest` en `main`.
+
+> Deploy a K8s no automatizado — runners de GitHub no acceden al cluster Docker Desktop local.
