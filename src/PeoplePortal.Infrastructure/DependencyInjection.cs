@@ -18,7 +18,7 @@ public static class DependencyInjection
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' was not found.");
 
         services.AddDbContext<PeoplePortalDbContext>(options =>
-            options.UseSqlServer(connectionString));
+            options.UseNpgsql(connectionString));
 
         services.AddScoped<IHrRequestRepository, HrRequestRepository>();
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();

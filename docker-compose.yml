@@ -6,27 +6,28 @@ services:
     image: peopleportal-api:latest
     container_name: peopleportal-api
     depends_on:
-      - sqlserver
+      - postgres
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
       Authentication__Authority: http://localhost:8080/realms/peopleportal
       Authentication__Audience: peopleportal-api
-      ConnectionStrings__DefaultConnection: Server=sqlserver,1433;Database=PeoplePortalDb;User Id=sa;Password=${SA_PASSWORD:-YourStrong@Passw0rd};TrustServerCertificate=True;
+      ConnectionStrings__DefaultConnection: Host=postgres;Database=PeoplePortalDb;Username=postgres;Password=${POSTGRES_PASSWORD:-YourStrong@Passw0rd};
     ports:
       - "8081:8080"
     restart: unless-stopped
 
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: peopleportal-sqlserver
+  postgres:
+    image: postgres:16-alpine
+    container_name: peopleportal-postgres
     environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: ${SA_PASSWORD:-YourStrong@Passw0rd}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-YourStrong@Passw0rd}
+      POSTGRES_DB: PeoplePortalDb
     ports:
-      - "1433:1433"
+      - "5432:5432"
     volumes:
-      - sqlserver-data:/var/opt/mssql
+      - postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
 
   nats:
@@ -47,9 +48,9 @@ services:
     profiles:
       - tools
     depends_on:
-      - sqlserver
+      - postgres
     environment:
-      ConnectionStrings__DefaultConnection: Server=sqlserver,1433;Database=PeoplePortalDb;User Id=sa;Password=${SA_PASSWORD:-YourStrong@Passw0rd};TrustServerCertificate=True;
+      ConnectionStrings__DefaultConnection: Host=postgres;Database=PeoplePortalDb;Username=postgres;Password=${POSTGRES_PASSWORD:-YourStrong@Passw0rd};
 
   etcd:
     image: bitnami/etcd:3.5
@@ -73,4 +74,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  sqlserver-data:
+  postgres-data:

@@ -18,7 +18,7 @@ public class PeoplePortalDbContextFactory : IDesignTimeDbContextFactory<PeoplePo
                 "Connection string not found. Set ConnectionStrings__DefaultConnection or ConnectionStrings:DefaultConnection.");
         }
 
-        optionsBuilder.UseSqlServer(connectionString);
+        optionsBuilder.UseNpgsql(connectionString);
 
         return new PeoplePortalDbContext(optionsBuilder.Options);
     }

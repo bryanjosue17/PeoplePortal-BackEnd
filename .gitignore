@@ -486,3 +486,10 @@ $RECYCLE.BIN/
 
 #Ignore vscode AI rules
 .github\instructions\codacy.instructions.md
+
+# Test Coverage Reports
+tests/CoverageMerged/
+tests/CoverageMergedLatest/
+CoverageReport/
+*.coverage
+*.coveragexml
