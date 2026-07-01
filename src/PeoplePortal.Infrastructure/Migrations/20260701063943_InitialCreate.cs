@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -17,7 +17,7 @@ namespace PeoplePortal.Infrastructure.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    body = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    body = table.Column<string>(type: "text", nullable: false),
                     type = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false),
                     published_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     expires_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
