@@ -11,7 +11,7 @@ API REST en .NET 9 con Clean Architecture + CQRS para el sistema de autoservicio
 | Mediator | MediatR |
 | Validación | FluentValidation |
 | ORM | Entity Framework Core 9 |
-| Base de datos | SQL Server 2022 |
+| Base de datos | PostgreSQL 16 |
 | Mensajería | NATS JetStream |
 | Autenticación | Keycloak (JWT Bearer + PKCE S256) |
 | API Gateway | APISIX (plugin openid-connect) |

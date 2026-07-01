@@ -27,7 +27,7 @@ graph TB
     end
 
     subgraph Infrastructure["PeoplePortal.Infrastructure — Adapters"]
-        EF["EF Core / SQL Server\nPeoplePortalDbContext"]
+        EF["EF Core / PostgreSQL\nPeoplePortalDbContext"]
         Repos["Repositories\nHrRequest, Employee, Document,\nAnnouncement, Benefit"]
         NATS["NATS JetStream\nNatsEventBus, EventConsumerService\nStream: peopleportal-events\nSubjects: hr.>, employee.>"]
         DI["DependencyInjection\nAddInfrastructure()"]
@@ -59,7 +59,7 @@ sequenceDiagram
     participant Val as ValidationBehavior
     participant Handler as Command Handler
     participant Repo as Repository
-    participant DB as SQL Server
+    participant DB as PostgreSQL
     participant NATS as NATS JetStream
 
     C->>API: POST /api/requests/vacation (JWT)

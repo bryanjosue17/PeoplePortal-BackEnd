@@ -1,6 +1,6 @@
 # Base de Datos — PeoplePortal
 
-SQL Server 2022 con Entity Framework Core 9. Naming convention: `snake_case`.
+PostgreSQL 16 con Entity Framework Core 9. Naming convention: `snake_case`.
 
 ## Diagrama ER
 
