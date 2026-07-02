@@ -27,7 +27,7 @@ BEGIN
     -------------------------------------------
     INSERT INTO announcements (id, title, body, type, published_at, created_by, is_active) VALUES
     (gen_random_uuid(), 'Nueva política de Teletrabajo', 'Estimado equipo, a partir del próximo mes implementaremos la política de 2 días de Home Office a la semana. Por favor coordinen con sus jefes directos los días asignados.', 'PolicyChange', NOW() - interval '2 days', admin_id, true),
-    (gen_random_uuid(), 'Mantenimiento del Sistema', 'El día sábado a las 2:00 AM el sistema de nómina entrará en mantenimiento programado por 4 horas.', 'Alerta', NOW() - interval '5 days', admin_id, true),
+    (gen_random_uuid(), 'Mantenimiento del Sistema', 'El día sábado a las 2:00 AM el sistema de nómina entrará en mantenimiento programado por 4 horas.', 'HrNotice', NOW() - interval '5 days', admin_id, true),
     (gen_random_uuid(), '¡Bienvenidos a los nuevos ingresos!', 'Queremos dar una cálida bienvenida a los 5 nuevos desarrolladores que se integran al equipo de Producto esta semana.', 'News', NOW() - interval '10 days', hr_id, true),
     (gen_random_uuid(), 'Fiesta de Fin de Año', '¡Guarden la fecha! La fiesta anual de la empresa será el 15 de Diciembre. Pronto enviaremos más detalles y el formulario de asistencia.', 'Event', NOW() - interval '12 days', hr_id, true),
     (gen_random_uuid(), 'Actualización de Datos Personales', 'Recordatorio: Tienen hasta fin de mes para actualizar su dirección y contacto de emergencia en el portal.', 'Reminder', NOW() - interval '1 day', hr_id, true);
