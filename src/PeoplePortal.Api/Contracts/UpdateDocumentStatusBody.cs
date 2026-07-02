@@ -1,5 +1,3 @@
 namespace PeoplePortal.Api.Contracts;
 
-public sealed record UpdateDocumentStatusBody(
-    string Status,
-    string? ReviewedBy);
+public sealed record UpdateDocumentStatusBody(string Status);

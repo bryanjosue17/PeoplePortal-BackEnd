@@ -116,7 +116,7 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAuthenticatedUser().RequireRole("jefe_inmediato"));
 
     options.AddPolicy("HrPolicy", policy =>
-        policy.RequireAuthenticatedUser().RequireRole("hr"));
+        policy.RequireAuthenticatedUser().RequireRole("hr", "admin"));
 
     options.AddPolicy("NominaPolicy", policy =>
         policy.RequireAuthenticatedUser().RequireRole("nomina"));

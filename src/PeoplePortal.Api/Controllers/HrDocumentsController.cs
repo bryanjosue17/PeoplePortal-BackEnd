@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PeoplePortal.Api.Contracts;
+using PeoplePortal.Api.Extensions;
 using PeoplePortal.Application.Documents.Commands.UploadDocument;
 using PeoplePortal.Application.Documents.Commands.UpdateDocumentStatus;
 using PeoplePortal.Application.Documents.Queries.GetAllDocuments;
@@ -32,8 +33,9 @@ public class HrDocumentsController(IMediator mediator) : ControllerBase
     [HttpPatch("{id:guid}/status")]
     public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateDocumentStatusBody body, CancellationToken cancellationToken)
     {
+        var reviewedBy = User.GetRequiredUserId();
         var result = await mediator.Send(
-            new UpdateDocumentStatusCommand(id, body.Status, body.ReviewedBy),
+            new UpdateDocumentStatusCommand(id, body.Status, reviewedBy),
             cancellationToken);
         return Ok(result);
     }
