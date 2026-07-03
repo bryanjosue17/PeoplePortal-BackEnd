@@ -74,14 +74,30 @@ Base URL (local): `http://localhost:30090/api` (vía APISIX) o `http://localhost
 
 ---
 
-## Vouchers de Pago
+## Nómina (Comprobantes de Pago)
 
 | Método | Ruta | Policy / Roles | Descripción |
 |---|---|---|---|
-| `GET` | `/api/vouchers/me` | EmployeePolicy | Mis vouchers de pago |
-| `GET` | `/api/hr/vouchers` | nomina, hr, admin | Listar todos los vouchers |
-| `POST` | `/api/hr/vouchers` | nomina, hr, admin | Crear voucher para un empleado |
-| `PATCH` | `/api/hr/vouchers/{id}/upload` | nomina, hr, admin | Adjuntar URL de archivo al voucher |
+| `GET` | `/api/nomina/me` | EmployeePolicy | Mis comprobantes de nómina |
+| `GET` | `/api/hr/nomina` | nomina, hr, admin | Listar todos los registros de nómina |
+| `POST` | `/api/hr/nomina` | nomina, hr, admin | Crear registro (tipo: ComprobanteDepago, Bonificacion, etc.) |
+| `PATCH` | `/api/hr/nomina/{id}/upload` | nomina, hr, admin | Adjuntar URL de archivo al registro |
+
+---
+
+## Gestión de Usuarios (Keycloak Admin)
+
+> Solo accesible con rol `hr` o `admin`. Proxy seguro a la Keycloak Admin REST API.
+
+| Método | Ruta | Policy | Descripción |
+|---|---|---|---|
+| `GET` | `/api/hr/users` | HrPolicy | Listar usuarios de Keycloak con empleado vinculado y roles |
+| `GET` | `/api/hr/users/roles` | HrPolicy | Listar roles del realm disponibles |
+| `GET` | `/api/hr/users/{id}/roles` | HrPolicy | Roles actuales de un usuario |
+| `POST` | `/api/hr/users` | HrPolicy | Crear usuario en Keycloak |
+| `PATCH` | `/api/hr/users/{id}/enabled` | HrPolicy | Habilitar / deshabilitar usuario |
+| `PUT` | `/api/hr/users/{id}/roles` | HrPolicy | Reemplazar roles del usuario |
+| `POST` | `/api/hr/users/{id}/reset-password` | HrPolicy | Restablecer contraseña |
 
 ---
 
