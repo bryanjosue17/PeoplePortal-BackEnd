@@ -7,9 +7,9 @@ using PeoplePortal.Application.Vouchers.Queries.GetMyVouchers;
 namespace PeoplePortal.Api.Controllers;
 
 [ApiController]
-[Route("api/vouchers")]
+[Route("api/nomina")]
 [Authorize(Policy = "EmployeePolicy")]
-public class VouchersController(IMediator mediator) : ControllerBase
+public class NominaController(IMediator mediator) : ControllerBase
 {
     [HttpGet("me")]
     public async Task<IActionResult> GetMine(CancellationToken cancellationToken)

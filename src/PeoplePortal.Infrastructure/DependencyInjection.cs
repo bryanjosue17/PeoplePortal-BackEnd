@@ -4,9 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 using NATS.Client.Core;
 using PeoplePortal.Application.Common.Interfaces;
 using PeoplePortal.Application.Contracts.Persistence;
+using PeoplePortal.Application.Contracts.Services;
 using PeoplePortal.Infrastructure.Messaging;
 using PeoplePortal.Infrastructure.Persistence;
 using PeoplePortal.Infrastructure.Persistence.Repositories;
+using PeoplePortal.Infrastructure.Services;
 
 namespace PeoplePortal.Infrastructure;
 
@@ -27,6 +29,17 @@ public static class DependencyInjection
         services.AddScoped<IBenefitRepository, BenefitRepository>();
         services.AddScoped<IVoucherRepository, VoucherRepository>();
 
+        // Keycloak Admin
+        services.Configure<KeycloakAdminOptions>(o =>
+        {
+            var s = configuration.GetSection("KeycloakAdmin");
+            o.BaseUrl       = s["BaseUrl"]       ?? string.Empty;
+            o.Realm         = s["Realm"]         ?? "peopleportal";
+            o.AdminUsername = s["AdminUsername"] ?? "admin";
+            o.AdminPassword = s["AdminPassword"] ?? string.Empty;
+        });
+        services.AddSingleton<IKeycloakAdminService, KeycloakAdminService>();
+
         var natsUrl = configuration.GetSection("Nats")["Url"] ?? "nats://localhost:4222";
 
         services.AddSingleton(_ => new NatsConnection(new NatsOpts { Url = natsUrl }));
@@ -36,3 +49,6 @@ public static class DependencyInjection
         return services;
     }
 }
+
+
+

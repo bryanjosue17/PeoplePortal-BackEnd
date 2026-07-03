@@ -11,7 +11,7 @@ public sealed class CreateVoucherForEmployeeCommandHandler(IVoucherRepository re
 {
     public async Task<VoucherDto> Handle(CreateVoucherForEmployeeCommand request, CancellationToken cancellationToken)
     {
-        var entity = Voucher.Create(request.EmployeeId, request.Period, request.Reason);
+        var entity = Voucher.Create(request.EmployeeId, request.Period, request.NominaType, request.Notes);
         await repository.AddAsync(entity, cancellationToken);
         await repository.SaveChangesAsync(cancellationToken);
         return entity.ToDto();

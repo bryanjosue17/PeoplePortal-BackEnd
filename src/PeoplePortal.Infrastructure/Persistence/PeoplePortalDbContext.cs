@@ -26,8 +26,7 @@ public class PeoplePortalDbContext(DbContextOptions<PeoplePortalDbContext> optio
             entity.Property(x => x.VacationStartDate).HasColumnName("vacation_start_date");
             entity.Property(x => x.VacationEndDate).HasColumnName("vacation_end_date");
             entity.Property(x => x.CertificateType).HasColumnName("certificate_type").HasMaxLength(120);
-            entity.Property(x => x.Period).HasColumnName("period").HasMaxLength(50);
-            entity.Property(x => x.Reason).HasColumnName("reason").HasMaxLength(500);
+            entity.Property(x => x.Period).HasColumnName("period").HasMaxLength(50);            entity.Property(x => x.Reason).HasColumnName("reason").HasMaxLength(500);
             entity.Property(x => x.HrComment).HasColumnName("hr_comment").HasMaxLength(500);
             entity.Property(x => x.ReviewedBy).HasColumnName("reviewed_by").HasMaxLength(150);
             entity.Property(x => x.CreatedAtUtc).HasColumnName("created_at_utc").IsRequired();
@@ -94,7 +93,7 @@ public class PeoplePortalDbContext(DbContextOptions<PeoplePortalDbContext> optio
             entity.Property(x => x.Period).HasColumnName("period").HasMaxLength(50).IsRequired();
             entity.Property(x => x.Status).HasColumnName("status").HasConversion<string>().HasMaxLength(30).IsRequired();
             entity.Property(x => x.FileUrl).HasColumnName("file_url").HasMaxLength(500);
-            entity.Property(x => x.Reason).HasColumnName("reason").HasMaxLength(500);
+            entity.Property(x => x.Notes).HasColumnName("notes").HasMaxLength(500);
             entity.Property(x => x.RequestedAt).HasColumnName("requested_at").IsRequired();
             entity.Property(x => x.UpdatedAtUtc).HasColumnName("updated_at_utc");
 
@@ -143,7 +142,7 @@ public class PeoplePortalDbContext(DbContextOptions<PeoplePortalDbContext> optio
             entity.Property(x => x.Period).HasColumnName("period").HasMaxLength(50).IsRequired();
             entity.Property(x => x.Status).HasColumnName("status").HasConversion<string>().HasMaxLength(30).IsRequired();
             entity.Property(x => x.FileUrl).HasColumnName("file_url").HasMaxLength(500);
-            entity.Property(x => x.Reason).HasColumnName("reason").HasMaxLength(500);
+            entity.Property(x => x.Notes).HasColumnName("notes").HasMaxLength(500);
             entity.Property(x => x.RequestedAt).HasColumnName("requested_at").IsRequired();
             entity.Property(x => x.UpdatedAtUtc).HasColumnName("updated_at_utc");
 
@@ -152,3 +151,6 @@ public class PeoplePortalDbContext(DbContextOptions<PeoplePortalDbContext> optio
         });
     }
 }
+
+
+

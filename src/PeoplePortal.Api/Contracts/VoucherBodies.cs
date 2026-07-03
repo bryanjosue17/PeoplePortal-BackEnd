@@ -1,4 +1,11 @@
+using PeoplePortal.Domain.Enums;
+
 namespace PeoplePortal.Api.Contracts;
 
-public sealed record CreateVoucherForEmployeeBody(string EmployeeId, string Period, string? Reason);
-public sealed record UploadVoucherFileBody(string FileUrl);
+public sealed record CreateNominaBody(
+    string EmployeeId,
+    string Period,
+    NominaType NominaType = NominaType.ComprobanteDepago,
+    string? Notes = null);
+
+public sealed record UploadNominaFileBody(string FileUrl);

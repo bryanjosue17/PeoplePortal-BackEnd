@@ -5,16 +5,14 @@ namespace PeoplePortal.Application.Vouchers.Mappings;
 
 public static class VoucherMappingExtensions
 {
-    public static VoucherDto ToDto(this Voucher voucher)
-    {
-        return new VoucherDto(
-            voucher.Id,
+    public static VoucherDto ToDto(this Voucher voucher) =>
+        new(voucher.Id,
             voucher.EmployeeId,
             voucher.Period,
+            voucher.NominaType.ToString(),
             voucher.Status.ToString(),
             voucher.FileUrl,
-            voucher.Reason,
+            voucher.Notes,
             voucher.RequestedAt,
             voucher.UpdatedAtUtc);
-    }
 }
