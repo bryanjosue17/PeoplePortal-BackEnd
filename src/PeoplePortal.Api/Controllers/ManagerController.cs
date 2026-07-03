@@ -8,11 +8,11 @@ using PeoplePortal.Application.Requests.Commands.ApproveByManager;
 namespace PeoplePortal.Api.Controllers;
 
 [ApiController]
-[Route("api/manager/requests/{id:guid}/status")]
+[Route("api/manager/requests")]
 [Authorize(Policy = "ManagerPolicy")]
 public class ManagerController(IMediator mediator) : ControllerBase
 {
-    [HttpPatch]
+    [HttpPatch("{id:guid}/status")]
     public async Task<IActionResult> Approve(Guid id, [FromBody] ManagerApprovalBody body, CancellationToken cancellationToken)
     {
         var managerId = User.GetRequiredUserId();

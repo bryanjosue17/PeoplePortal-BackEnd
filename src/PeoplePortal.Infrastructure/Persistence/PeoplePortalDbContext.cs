@@ -109,7 +109,7 @@ public class PeoplePortalDbContext(DbContextOptions<PeoplePortalDbContext> optio
 
             entity.Property(x => x.Id).HasColumnName("id");
             entity.Property(x => x.Title).HasColumnName("title").HasMaxLength(200).IsRequired();
-            entity.Property(x => x.Body).HasColumnName("body").HasColumnType("nvarchar(max)").IsRequired();
+            entity.Property(x => x.Body).HasColumnName("body").HasColumnType("text").IsRequired();
             entity.Property(x => x.Type).HasColumnName("type").HasConversion<string>().HasMaxLength(30).IsRequired();
             entity.Property(x => x.PublishedAt).HasColumnName("published_at").IsRequired();
             entity.Property(x => x.ExpiresAt).HasColumnName("expires_at");

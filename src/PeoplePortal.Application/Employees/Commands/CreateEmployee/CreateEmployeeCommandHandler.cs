@@ -15,6 +15,10 @@ public sealed class CreateEmployeeCommandHandler(IEmployeeRepository repository)
         if (!Enum.TryParse<ContractType>(request.ContractType, ignoreCase: true, out var contractType))
             throw new ArgumentException($"Invalid ContractType: {request.ContractType}");
 
+        var existing = await repository.GetByKeycloakIdAsync(request.KeycloakId, cancellationToken);
+        if (existing is not null)
+            throw new InvalidOperationException($"An employee with KeycloakId '{request.KeycloakId}' already exists.");
+
         Employee entity = Employee.Create(
             request.KeycloakId, request.Code, request.FullName, request.Email,
             request.Department, request.Position, request.HireDate,

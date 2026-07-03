@@ -7,7 +7,7 @@ sequenceDiagram
     participant C as Colaborador (React)
     participant A as APISIX Gateway
     participant API as PeoplePortal API
-    participant DB as SQL Server
+    participant DB as PostgreSQL
     participant N as NATS JetStream
 
     C->>A: POST /api/requests/vacation (JWT Bearer)
@@ -30,7 +30,7 @@ sequenceDiagram
     participant J as Jefe Inmediato
     participant A as APISIX Gateway
     participant API as PeoplePortal API
-    participant DB as SQL Server
+    participant DB as PostgreSQL
     participant N as NATS JetStream
 
     J->>A: PATCH /api/manager/requests/{id}/status (JWT)
@@ -52,7 +52,7 @@ sequenceDiagram
     participant H as RRHH
     participant A as APISIX Gateway
     participant API as PeoplePortal API
-    participant DB as SQL Server
+    participant DB as PostgreSQL
 
     H->>A: POST /api/hr/documents (JWT + archivo)
     A->>A: Validar token + HrPolicy
@@ -71,7 +71,7 @@ sequenceDiagram
     participant C as Colaborador
     participant A as APISIX Gateway
     participant API as PeoplePortal API
-    participant DB as SQL Server
+    participant DB as PostgreSQL
 
     C->>A: GET /api/dashboard (JWT)
     A->>A: Validar token + EmployeePolicy
