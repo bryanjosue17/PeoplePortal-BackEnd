@@ -1,6 +1,28 @@
 # Changelog
 
-## [0.2.0] — 2026-06-29
+## [0.3.0] — 2026-07-03
+
+### Added
+- **Vouchers API completa**: `IVoucherRepository`, `VoucherRepository`, mapeo EF Core de la entidad `Voucher`
+  - `GET /api/vouchers/me` (EmployeePolicy) — consulta de vouchers propios
+  - `GET /api/hr/vouchers` (roles: nomina, hr, admin) — listado completo
+  - `POST /api/hr/vouchers` — crear voucher para un empleado
+  - `PATCH /api/hr/vouchers/{id}/upload` — adjuntar URL de archivo al voucher
+- **Endpoint Jefe Inmediato** `GET /api/manager/requests` — lista solicitudes asignadas al manager (usa `ReviewedBy = managerId`)
+- **Deactivate Announcement**: `PATCH /api/hr/announcements/{id}/deactivate` (HrPolicy) con `DeactivateAnnouncementCommand`
+- `GetMyTeamRequestsQuery` + handler para el nuevo endpoint de manager
+- `CreateVoucherForEmployeeCommand`, `UploadVoucherFileCommand` + handlers
+- `GetMyVouchersQuery`, `GetAllVouchersQuery` + handlers
+- `IVoucherRepository` registrado en DI
+
+### Changed
+- `IHrRequestRepository`: nuevo método `GetByManagerIdAsync(managerId)` filtrando por campo `reviewed_by`
+- `HrRequestRepository`: implementa `GetByManagerIdAsync`
+- `PeoplePortalDbContext`: mapeo completo de la entidad `Voucher` (tabla `vouchers`, índices)
+- `AnnouncementsController`: agrega ruta `PATCH ~/api/hr/announcements/{id:guid}/deactivate`
+- `ManagerController`: agrega `GET` para listar solicitudes del equipo
+
+
 
 ### Added
 - 5 nuevas entidades de dominio: Employee, Document, Voucher, Announcement, Benefit

@@ -31,6 +31,14 @@ public class HrRequestRepository(PeoplePortalDbContext dbContext) : IHrRequestRe
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IReadOnlyList<HrRequest>> GetByManagerIdAsync(string managerId, CancellationToken cancellationToken)
+    {
+        return await dbContext.HrRequests
+            .Where(x => x.ReviewedBy == managerId)
+            .OrderByDescending(x => x.CreatedAtUtc)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {
         await dbContext.SaveChangesAsync(cancellationToken);

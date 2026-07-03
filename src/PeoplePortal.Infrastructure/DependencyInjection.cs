@@ -25,6 +25,7 @@ public static class DependencyInjection
         services.AddScoped<IDocumentRepository, DocumentRepository>();
         services.AddScoped<IAnnouncementRepository, AnnouncementRepository>();
         services.AddScoped<IBenefitRepository, BenefitRepository>();
+        services.AddScoped<IVoucherRepository, VoucherRepository>();
 
         var natsUrl = configuration.GetSection("Nats")["Url"] ?? "nats://localhost:4222";
 

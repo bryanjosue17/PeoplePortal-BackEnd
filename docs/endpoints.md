@@ -26,9 +26,10 @@ Base URL (local): `http://localhost:30090/api` (vía APISIX) o `http://localhost
 | `POST` | `/api/requests/voucher` | EmployeePolicy | Crear solicitud de voucher de pago |
 | `POST` | `/api/requests/{id}/cancel` | EmployeePolicy | Cancelar solicitud propia |
 | `GET` | `/api/requests/me` | EmployeePolicy | Listar mis solicitudes |
-| `PATCH` | `/api/manager/requests/{id}/status` | ManagerPolicy | Aprobar/rechazar como jefe |
+| `GET` | `/api/manager/requests` | ManagerPolicy | Listar solicitudes del equipo propio (ReviewedBy = managerId) |
+| `PATCH` | `/api/manager/requests/{id}/status` | ManagerPolicy | Aprobar/rechazar como jefe inmediato |
 | `GET` | `/api/hr/requests` | HrPolicy | Listar todas las solicitudes |
-| `PATCH` | `/api/hr/requests/{id}/status` | HrPolicy | Actualizar estado como RRHH |
+| `PATCH` | `/api/hr/requests/{id}/status` | HrPolicy | Actualizar estado como RRHH (acepta `hrComment`) |
 
 ---
 
@@ -49,6 +50,7 @@ Base URL (local): `http://localhost:30090/api` (vía APISIX) o `http://localhost
 |---|---|---|---|
 | `GET` | `/api/announcements` | EmployeePolicy | Comunicados activos |
 | `POST` | `/api/hr/announcements` | HrPolicy | Publicar comunicado |
+| `PATCH` | `/api/hr/announcements/{id}/deactivate` | HrPolicy | Desactivar comunicado |
 
 ---
 
@@ -69,6 +71,17 @@ Base URL (local): `http://localhost:30090/api` (vía APISIX) o `http://localhost
 | Método | Ruta | Policy | Descripción |
 |---|---|---|---|
 | `GET` | `/api/dashboard` | EmployeePolicy | Perfil + solicitudes + documentos + comunicados + beneficios |
+
+---
+
+## Vouchers de Pago
+
+| Método | Ruta | Policy / Roles | Descripción |
+|---|---|---|---|
+| `GET` | `/api/vouchers/me` | EmployeePolicy | Mis vouchers de pago |
+| `GET` | `/api/hr/vouchers` | nomina, hr, admin | Listar todos los vouchers |
+| `POST` | `/api/hr/vouchers` | nomina, hr, admin | Crear voucher para un empleado |
+| `PATCH` | `/api/hr/vouchers/{id}/upload` | nomina, hr, admin | Adjuntar URL de archivo al voucher |
 
 ---
 
