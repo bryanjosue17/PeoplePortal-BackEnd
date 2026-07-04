@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PeoplePortal.Api.Contracts;
 using PeoplePortal.Api.Extensions;
 using PeoplePortal.Application.Announcements.Commands.CreateAnnouncement;
+using PeoplePortal.Application.Announcements.Commands.DeactivateAnnouncement;
 using PeoplePortal.Application.Announcements.Queries.GetActiveAnnouncements;
 
 namespace PeoplePortal.Api.Controllers;
@@ -30,5 +31,13 @@ public class AnnouncementsController(IMediator mediator) : ControllerBase
                 body.ExpiresAt?.ToDateTime(TimeOnly.MinValue)),
             cancellationToken);
         return CreatedAtAction(nameof(GetActive), new { id = result.Id }, result);
+    }
+
+    [HttpPatch("~/api/hr/announcements/{id:guid}/deactivate")]
+    [Authorize(Policy = "HrPolicy")]
+    public async Task<IActionResult> Deactivate(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await mediator.Send(new DeactivateAnnouncementCommand(id), cancellationToken);
+        return Ok(result);
     }
 }

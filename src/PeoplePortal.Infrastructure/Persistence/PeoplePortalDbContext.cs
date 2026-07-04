@@ -26,8 +26,7 @@ public class PeoplePortalDbContext(DbContextOptions<PeoplePortalDbContext> optio
             entity.Property(x => x.VacationStartDate).HasColumnName("vacation_start_date");
             entity.Property(x => x.VacationEndDate).HasColumnName("vacation_end_date");
             entity.Property(x => x.CertificateType).HasColumnName("certificate_type").HasMaxLength(120);
-            entity.Property(x => x.Period).HasColumnName("period").HasMaxLength(50);
-            entity.Property(x => x.Reason).HasColumnName("reason").HasMaxLength(500);
+            entity.Property(x => x.Period).HasColumnName("period").HasMaxLength(50);            entity.Property(x => x.Reason).HasColumnName("reason").HasMaxLength(500);
             entity.Property(x => x.HrComment).HasColumnName("hr_comment").HasMaxLength(500);
             entity.Property(x => x.ReviewedBy).HasColumnName("reviewed_by").HasMaxLength(150);
             entity.Property(x => x.CreatedAtUtc).HasColumnName("created_at_utc").IsRequired();
@@ -94,7 +93,7 @@ public class PeoplePortalDbContext(DbContextOptions<PeoplePortalDbContext> optio
             entity.Property(x => x.Period).HasColumnName("period").HasMaxLength(50).IsRequired();
             entity.Property(x => x.Status).HasColumnName("status").HasConversion<string>().HasMaxLength(30).IsRequired();
             entity.Property(x => x.FileUrl).HasColumnName("file_url").HasMaxLength(500);
-            entity.Property(x => x.Reason).HasColumnName("reason").HasMaxLength(500);
+            entity.Property(x => x.Notes).HasColumnName("notes").HasMaxLength(500);
             entity.Property(x => x.RequestedAt).HasColumnName("requested_at").IsRequired();
             entity.Property(x => x.UpdatedAtUtc).HasColumnName("updated_at_utc");
 
@@ -132,5 +131,26 @@ public class PeoplePortalDbContext(DbContextOptions<PeoplePortalDbContext> optio
 
             entity.HasIndex(x => x.IsActive).HasDatabaseName("ix_benefits_is_active");
         });
+
+        modelBuilder.Entity<Voucher>(entity =>
+        {
+            entity.ToTable("vouchers");
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.EmployeeId).HasColumnName("employee_id").HasMaxLength(150).IsRequired();
+            entity.Property(x => x.Period).HasColumnName("period").HasMaxLength(50).IsRequired();
+            entity.Property(x => x.Status).HasColumnName("status").HasConversion<string>().HasMaxLength(30).IsRequired();
+            entity.Property(x => x.FileUrl).HasColumnName("file_url").HasMaxLength(500);
+            entity.Property(x => x.Notes).HasColumnName("notes").HasMaxLength(500);
+            entity.Property(x => x.RequestedAt).HasColumnName("requested_at").IsRequired();
+            entity.Property(x => x.UpdatedAtUtc).HasColumnName("updated_at_utc");
+
+            entity.HasIndex(x => x.EmployeeId).HasDatabaseName("ix_vouchers_employee_id");
+            entity.HasIndex(x => x.Status).HasDatabaseName("ix_vouchers_status");
+        });
     }
 }
+
+
+

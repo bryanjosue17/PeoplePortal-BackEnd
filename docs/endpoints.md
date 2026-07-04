@@ -26,9 +26,10 @@ Base URL (local): `http://localhost:30090/api` (vía APISIX) o `http://localhost
 | `POST` | `/api/requests/voucher` | EmployeePolicy | Crear solicitud de voucher de pago |
 | `POST` | `/api/requests/{id}/cancel` | EmployeePolicy | Cancelar solicitud propia |
 | `GET` | `/api/requests/me` | EmployeePolicy | Listar mis solicitudes |
-| `PATCH` | `/api/manager/requests/{id}/status` | ManagerPolicy | Aprobar/rechazar como jefe |
+| `GET` | `/api/manager/requests` | ManagerPolicy | Listar solicitudes del equipo propio (ReviewedBy = managerId) |
+| `PATCH` | `/api/manager/requests/{id}/status` | ManagerPolicy | Aprobar/rechazar como jefe inmediato |
 | `GET` | `/api/hr/requests` | HrPolicy | Listar todas las solicitudes |
-| `PATCH` | `/api/hr/requests/{id}/status` | HrPolicy | Actualizar estado como RRHH |
+| `PATCH` | `/api/hr/requests/{id}/status` | HrPolicy | Actualizar estado como RRHH (acepta `hrComment`) |
 
 ---
 
@@ -49,6 +50,7 @@ Base URL (local): `http://localhost:30090/api` (vía APISIX) o `http://localhost
 |---|---|---|---|
 | `GET` | `/api/announcements` | EmployeePolicy | Comunicados activos |
 | `POST` | `/api/hr/announcements` | HrPolicy | Publicar comunicado |
+| `PATCH` | `/api/hr/announcements/{id}/deactivate` | HrPolicy | Desactivar comunicado |
 
 ---
 
@@ -69,6 +71,33 @@ Base URL (local): `http://localhost:30090/api` (vía APISIX) o `http://localhost
 | Método | Ruta | Policy | Descripción |
 |---|---|---|---|
 | `GET` | `/api/dashboard` | EmployeePolicy | Perfil + solicitudes + documentos + comunicados + beneficios |
+
+---
+
+## Nómina (Comprobantes de Pago)
+
+| Método | Ruta | Policy / Roles | Descripción |
+|---|---|---|---|
+| `GET` | `/api/nomina/me` | EmployeePolicy | Mis comprobantes de nómina |
+| `GET` | `/api/hr/nomina` | nomina, hr, admin | Listar todos los registros de nómina |
+| `POST` | `/api/hr/nomina` | nomina, hr, admin | Crear registro (tipo: ComprobanteDepago, Bonificacion, etc.) |
+| `PATCH` | `/api/hr/nomina/{id}/upload` | nomina, hr, admin | Adjuntar URL de archivo al registro |
+
+---
+
+## Gestión de Usuarios (Keycloak Admin)
+
+> Solo accesible con rol `hr` o `admin`. Proxy seguro a la Keycloak Admin REST API.
+
+| Método | Ruta | Policy | Descripción |
+|---|---|---|---|
+| `GET` | `/api/hr/users` | HrPolicy | Listar usuarios de Keycloak con empleado vinculado y roles |
+| `GET` | `/api/hr/users/roles` | HrPolicy | Listar roles del realm disponibles |
+| `GET` | `/api/hr/users/{id}/roles` | HrPolicy | Roles actuales de un usuario |
+| `POST` | `/api/hr/users` | HrPolicy | Crear usuario en Keycloak |
+| `PATCH` | `/api/hr/users/{id}/enabled` | HrPolicy | Habilitar / deshabilitar usuario |
+| `PUT` | `/api/hr/users/{id}/roles` | HrPolicy | Reemplazar roles del usuario |
+| `POST` | `/api/hr/users/{id}/reset-password` | HrPolicy | Restablecer contraseña |
 
 ---
 
