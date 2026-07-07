@@ -106,6 +106,7 @@ public sealed class KeycloakAdminService(IOptions<KeycloakAdminOptions> opts) : 
     // ── Roles ─────────────────────────────────────────────────────────────
     public async Task<IReadOnlyList<KeycloakRoleDto>> GetRealmRolesAsync(CancellationToken ct = default)
     {
+        await SetAuthHeaderAsync(ct);
         var roles = await _http.GetFromJsonAsync<List<JsonElement>>(
             $"{_o.BaseUrl}/admin/realms/{_o.Realm}/roles", ct) ?? [];
 

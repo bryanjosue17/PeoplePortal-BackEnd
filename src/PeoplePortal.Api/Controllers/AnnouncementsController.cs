@@ -28,7 +28,7 @@ public class AnnouncementsController(IMediator mediator) : ControllerBase
         var createdBy = User.GetRequiredUserId();
         var result = await mediator.Send(
             new CreateAnnouncementCommand(body.Title, body.Body, body.Type, createdBy,
-                body.ExpiresAt?.ToDateTime(TimeOnly.MinValue)),
+                body.ExpiresAt?.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc)),
             cancellationToken);
         return CreatedAtAction(nameof(GetActive), new { id = result.Id }, result);
     }

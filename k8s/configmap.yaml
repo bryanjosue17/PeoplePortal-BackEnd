@@ -12,3 +12,4 @@ data:
   KeycloakAdmin__BaseUrl: "http://keycloak-service:8080"
   KeycloakAdmin__Realm: "peopleportal"
   KeycloakAdmin__AdminUsername: "admin"
+  KeycloakAdmin__AdminPassword: "admin"
