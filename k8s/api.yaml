@@ -24,8 +24,8 @@ spec:
             - "until nc -z keycloak-service 8080; do echo waiting for keycloak; sleep 3; done"
       containers:
         - name: api
-          image: peopleportal-api:latest
-          imagePullPolicy: Never
+          image: ghcr.io/bryanjosue17/peopleportal-api:main
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           envFrom:
