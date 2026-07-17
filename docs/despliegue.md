@@ -31,36 +31,42 @@ Servicios levantados:
 ## Kubernetes (Docker Desktop)
 
 ```bash
-# Namespace
-kubectl apply -f k8s/namespace.yaml
-
-# Config y secretos
-kubectl apply -f k8s/configmap.yaml
-kubectl apply -f k8s/secret.yaml
-
-# Crear imagePullSecret para GHCR (requiere gh CLI)
+# Crear imagePullSecret
 kubectl create secret docker-registry ghcr-secret \
-  --docker-server=ghcr.io \
-  --docker-username=bryanjosue17 \
-  --docker-password="$(gh auth token)" \
-  --namespace=peopleportal \
+  --docker-server=ghcr.io --docker-username=bryanjosue17 \
+  --docker-password="$(gh auth token)" --namespace=peopleportal \
   --dry-run=client -o yaml | kubectl apply -f -
 
-# Base de datos y mensajería
+# Infraestructura (sin imagen)
+kubectl apply -f k8s/configmap.yaml
 kubectl apply -f k8s/postgres.yaml
 kubectl apply -f k8s/nats.yaml
 
-# Migraciones (usa imagen GHCR ghcr.io/bryanjosue17/peopleportal-api-migrations)
-kubectl apply -f k8s/migration-job.yaml
+# Migraciones + API via Kustomize overlay
+# Desarrollo — imagen :develop
+kubectl delete job peopleportal-migrations --ignore-not-found -n peopleportal
+kubectl apply -k k8s/overlays/develop/
 kubectl wait --for=condition=complete job/peopleportal-migrations \
   -n peopleportal --timeout=180s
+kubectl rollout restart deployment/peopleportal-api -n peopleportal
 
-# API (usa imagen GHCR ghcr.io/bryanjosue17/peopleportal-api)
-kubectl apply -f k8s/api.yaml
+# Producción — imagen :main
+# kubectl apply -k k8s/overlays/production/
+```
 
-# Verificar
-kubectl rollout status deployment/peopleportal-api -n peopleportal
-kubectl get pods -n peopleportal
+**Estructura Kustomize:**
+```
+k8s/
+├── configmap.yaml     # Sin imagen
+├── postgres.yaml      # Sin imagen
+├── nats.yaml          # Sin imagen
+├── base/              # api.yaml + migration-job.yaml (imagen :develop por defecto)
+│   ├── kustomization.yaml
+│   ├── api.yaml
+│   └── migration-job.yaml
+└── overlays/
+    ├── develop/           # Parcha api + migrations a :develop
+    └── production/        # Parcha api + migrations a :main
 ```
 
 ---
