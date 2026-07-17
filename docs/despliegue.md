@@ -38,16 +38,24 @@ kubectl apply -f k8s/namespace.yaml
 kubectl apply -f k8s/configmap.yaml
 kubectl apply -f k8s/secret.yaml
 
+# Crear imagePullSecret para GHCR (requiere gh CLI)
+kubectl create secret docker-registry ghcr-secret \
+  --docker-server=ghcr.io \
+  --docker-username=bryanjosue17 \
+  --docker-password="$(gh auth token)" \
+  --namespace=peopleportal \
+  --dry-run=client -o yaml | kubectl apply -f -
+
 # Base de datos y mensajería
 kubectl apply -f k8s/postgres.yaml
 kubectl apply -f k8s/nats.yaml
 
-# Migraciones (esperar a que completen)
+# Migraciones (usa imagen GHCR ghcr.io/bryanjosue17/peopleportal-api-migrations)
 kubectl apply -f k8s/migration-job.yaml
 kubectl wait --for=condition=complete job/peopleportal-migrations \
   -n peopleportal --timeout=180s
 
-# API
+# API (usa imagen GHCR ghcr.io/bryanjosue17/peopleportal-api)
 kubectl apply -f k8s/api.yaml
 
 # Verificar
@@ -76,8 +84,8 @@ Pipeline: `.github/workflows/ci.yml`
 | Job | Trigger | Acciones |
 |---|---|---|
 | `build-test` | Push a cualquier rama | restore → build → dotnet test (cobertura XPlat) → Codacy → Trivy |
-| `docker` | Push a `develop` / `main` | docker build → push a GHCR |
+| `docker` | Push a `develop` / `main` | docker build → push a GHCR (`ghcr.io/bryanjosue17/peopleportal-api` y `peopleportal-api-migrations`) |
 
-Tags de imagen: `{branch}-{short-sha}` y `latest` en `main`.
+Tags de imagen: `{branch}` y `{short-sha}` (7 chars del commit SHA).
 
 > Deploy a K8s no automatizado — runners de GitHub no acceden al cluster Docker Desktop local.
