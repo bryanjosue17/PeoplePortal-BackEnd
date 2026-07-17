@@ -1,9 +1,21 @@
 # Changelog
 
+## [0.4.0] — 2026-07-17
+
+### Changed
+- **Módulo Vouchers renombrado a Nómina**: entidad `Voucher` → `Nomina`, enum `VoucherStatus` → `NominaType`
+  - Rutas actualizadas: `/api/vouchers/*` → `/api/nomina/*` y `/api/hr/vouchers/*` → `/api/hr/nomina/*`
+  - Campos: `period`, `status` + nuevo campo `notes` (opcional)
+  - `NominaType` enum: `ComprobanteDepago`, `Bonificacion`, `Adelanto`, `Aguinaldo`, `Vacaciones`, `Otro`
+  - Migración de base de datos: tabla `vouchers` → tabla `nomina`
+  - `INominaRepository`, `NominaRepository` (reemplaza IVoucherRepository)
+- **Kustomize K8s**: `api.yaml` y `migration-job.yaml` movidos a `k8s/base/`; overlays `develop`/`production` para tags de imagen GHCR
+- **Imágenes GHCR**: `imagePullPolicy: Never` → `Always`, imagen `ghcr.io/bryanjosue17/peopleportal-api:main`
+
 ## [0.3.0] — 2026-07-03
 
 ### Added
-- **Vouchers API completa**: `IVoucherRepository`, `VoucherRepository`, mapeo EF Core de la entidad `Voucher`
+- **Vouchers API completa** (posteriormente renombrada a Nómina en v0.4.0): `IVoucherRepository`, `VoucherRepository`, mapeo EF Core de la entidad `Voucher`
   - `GET /api/vouchers/me` (EmployeePolicy) — consulta de vouchers propios
   - `GET /api/hr/vouchers` (roles: nomina, hr, admin) — listado completo
   - `POST /api/hr/vouchers` — crear voucher para un empleado
