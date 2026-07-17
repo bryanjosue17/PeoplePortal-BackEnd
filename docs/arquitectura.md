@@ -22,13 +22,13 @@ graph TB
     end
 
     subgraph Domain["PeoplePortal.Domain — Core"]
-        Entities["Entities\nEmployee, HrRequest, Document,\nVoucher, Announcement, Benefit"]
-        Enums["Enums\nRequestStatus, RequestType,\nContractType, EmployeeStatus,\nDocumentStatus, VoucherStatus,\nAnnouncementType"]
+        Entities["Entities\nEmployee, HrRequest, Document,\nNomina, Announcement, Benefit"]
+        Enums["Enums\nRequestStatus, RequestType,\nContractType, EmployeeStatus,\nDocumentStatus, NominaType,\nAnnouncementType"]
     end
 
     subgraph Infrastructure["PeoplePortal.Infrastructure — Adapters"]
         EF["EF Core / PostgreSQL\nPeoplePortalDbContext"]
-        Repos["Repositories\nHrRequest, Employee, Document,\nAnnouncement, Benefit"]
+        Repos["Repositories\nHrRequest, Employee, Document,\nAnnouncement, Benefit, Nomina"]
         NATS["NATS JetStream\nNatsEventBus, EventConsumerService\nStream: peopleportal-events\nSubjects: hr.>, employee.>"]
         DI["DependencyInjection\nAddInfrastructure()"]
     end
