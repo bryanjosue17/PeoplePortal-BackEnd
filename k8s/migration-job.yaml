@@ -11,10 +11,12 @@ spec:
         app: peopleportal-migrations
     spec:
       restartPolicy: OnFailure
+      imagePullSecrets:
+        - name: ghcr-secret
       containers:
         - name: migrate
-          image: peopleportal-api-migrations:latest
-          imagePullPolicy: Never
+          image: ghcr.io/bryanjosue17/peopleportal-api-migrations:main
+          imagePullPolicy: Always
           env:
             - name: ConnectionStrings__DefaultConnection
               valueFrom:

@@ -15,6 +15,8 @@ spec:
       labels:
         app: peopleportal-api
     spec:
+      imagePullSecrets:
+        - name: ghcr-secret
       initContainers:
         - name: wait-keycloak
           image: busybox:1.36
