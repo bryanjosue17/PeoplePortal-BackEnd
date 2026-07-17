@@ -9,12 +9,13 @@ public class VoucherTests
     [Fact]
     public void Create_ShouldSetRequestedStatus()
     {
-        var voucher = Voucher.Create("emp-1", "2026-06", "Grocery");
+        var voucher = Voucher.Create("emp-1", "2026-06", NominaType.ComprobanteDepago, "Grocery");
 
         voucher.EmployeeId.Should().Be("emp-1");
         voucher.Period.Should().Be("2026-06");
         voucher.Status.Should().Be(VoucherStatus.Requested);
-        voucher.Reason.Should().Be("Grocery");
+        voucher.NominaType.Should().Be(NominaType.ComprobanteDepago);
+        voucher.Notes.Should().Be("Grocery");
         voucher.Id.Should().NotBeEmpty();
     }
 
@@ -37,6 +38,6 @@ public class VoucherTests
 
         var act = () => voucher.SetStatus(VoucherStatus.InProcess);
 
-        act.Should().Throw<InvalidOperationException>().WithMessage("Cannot change status of a finalized voucher.");
+        act.Should().Throw<InvalidOperationException>().WithMessage("Cannot change status of a finalized nomina record.");
     }
 }
