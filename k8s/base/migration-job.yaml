@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: peopleportal-migrations
+  namespace: peopleportal
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: peopleportal-migrations
+    spec:
+      restartPolicy: OnFailure
+      imagePullSecrets:
+        - name: ghcr-secret
+      containers:
+        - name: migrate
+          image: ghcr.io/bryanjosue17/peopleportal-api-migrations:develop
+          imagePullPolicy: Always
+          env:
+            - name: ConnectionStrings__DefaultConnection
+              valueFrom:
+                secretKeyRef:
+                  name: peopleportal-secrets
+                  key: ConnectionStrings__DefaultConnection
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
