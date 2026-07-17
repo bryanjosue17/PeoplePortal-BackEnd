@@ -5,11 +5,10 @@
 ```bash
 cd PeoplePortal-BackEnd
 
-# Variables requeridas
-$env:SA_PASSWORD  = "YourStrong@Passw0rd"
-$env:KEYCLOAK_URL = "http://localhost:8080"
+# Variable opcional (tiene valor por defecto en docker-compose)
+POSTGRES_PASSWORD=YourStrong@Passw0rd
 
-# Levantar SQL Server + NATS + API
+# Levantar PostgreSQL + NATS + API
 docker-compose up -d
 
 # Aplicar migraciones
@@ -24,7 +23,7 @@ Servicios levantados:
 | Servicio | Puerto local |
 |---|---|
 | API | 8081 |
-| SQL Server | 1433 |
+| PostgreSQL | 5432 |
 | NATS | 4222 |
 
 ---
@@ -40,7 +39,7 @@ kubectl apply -f k8s/configmap.yaml
 kubectl apply -f k8s/secret.yaml
 
 # Base de datos y mensajería
-kubectl apply -f k8s/sqlserver.yaml
+kubectl apply -f k8s/postgres.yaml
 kubectl apply -f k8s/nats.yaml
 
 # Migraciones (esperar a que completen)
@@ -62,8 +61,8 @@ kubectl get pods -n peopleportal
 
 | Variable | Descripción | Ejemplo |
 |---|---|---|
-| `SA_PASSWORD` | Contraseña SA de SQL Server | `YourStrong@Passw0rd` |
-| `ConnectionStrings__DefaultConnection` | Connection string completa | `Server=...` |
+| `POSTGRES_PASSWORD` | Contraseña del usuario `postgres` en PostgreSQL | `YourStrong@Passw0rd` |
+| `ConnectionStrings__DefaultConnection` | Connection string completa | `Host=postgres;Database=PeoplePortalDb;Username=postgres;Password=...` |
 | `Keycloak__Authority` | URL del realm Keycloak | `http://keycloak:8080/realms/peopleportal` |
 | `Keycloak__Audience` | Audience del JWT | `peopleportal-api` |
 | `NATS__Url` | URL del servidor NATS | `nats://nats-service:4222` |

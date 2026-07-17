@@ -20,9 +20,8 @@ API REST en .NET 9 con Clean Architecture + CQRS para el sistema de autoservicio
 ## Cómo correr localmente
 
 ```bash
-# Variables requeridas
-$env:SA_PASSWORD  = "YourStrong@Passw0rd"
-$env:KEYCLOAK_URL = "http://localhost:8080"
+# Variable opcional (tiene valor por defecto en docker-compose)
+export POSTGRES_PASSWORD=YourStrong@Passw0rd
 
 # Levantar servicios
 docker-compose up -d
