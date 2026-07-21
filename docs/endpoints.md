@@ -62,7 +62,8 @@ Base URL (local): `http://localhost:30090/api` (vía APISIX) o `http://localhost
 | `GET` | `/api/hr/benefits` | HrPolicy | Todos los beneficios (incluso inactivos) |
 | `POST` | `/api/hr/benefits` | HrPolicy | Crear beneficio |
 | `PUT` | `/api/hr/benefits/{id}` | HrPolicy | Actualizar beneficio |
-| `DELETE` | `/api/hr/benefits/{id}` | HrPolicy | Desactivar beneficio |
+| `DELETE` | `/api/hr/benefits/{id}` | HrPolicy | Desactivar beneficio (soft-delete) |
+| `PATCH` | `/api/hr/benefits/{id}/activate` | HrPolicy | Reactivar beneficio inactivo |
 
 ---
 
