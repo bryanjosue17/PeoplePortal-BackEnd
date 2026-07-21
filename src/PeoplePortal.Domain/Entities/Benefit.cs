@@ -34,6 +34,11 @@ public class Benefit
         IsActive = false;
     }
 
+    public void Activate()
+    {
+        IsActive = true;
+    }
+
     public void Update(string name, string? description)
     {
         Name = name;

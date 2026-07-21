@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PeoplePortal.Api.Contracts;
+using PeoplePortal.Application.Benefits.Commands.ActivateBenefit;
 using PeoplePortal.Application.Benefits.Commands.CreateBenefit;
 using PeoplePortal.Application.Benefits.Commands.DeactivateBenefit;
 using PeoplePortal.Application.Benefits.Commands.UpdateBenefit;
@@ -43,6 +44,13 @@ public class HrBenefitsController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> Deactivate(Guid id, CancellationToken cancellationToken)
     {
         await mediator.Send(new DeactivateBenefitCommand(id), cancellationToken);
+        return NoContent();
+    }
+
+    [HttpPatch("{id:guid}/activate")]
+    public async Task<IActionResult> Activate(Guid id, CancellationToken cancellationToken)
+    {
+        await mediator.Send(new ActivateBenefitCommand(id), cancellationToken);
         return NoContent();
     }
 }
